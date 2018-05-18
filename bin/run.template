@@ -1,0 +1,540 @@
+#!/bin/tcsh
+%(queue_info)s
+
+#--------------------------------------------------------------------------------------------------------
+  unalias *
+  %(echo_opt)s
+
+#--------------------------------------------------------------------------------------------------------
+  set compile_opt    = "%(compile_opt)s"
+  set rootdir        = %(cwd)s/%(workdir)s
+  set name           = %(name)s
+  set version        = %(version)s
+  set exp_name       = %(exp_name)s
+  
+#--------------------------------------------------------------------------------------------------------
+  setenv FTMPDIR %(FTMPDIR)s
+  set work           = $FTMPDIR  
+  set platform       = %(platform)s
+  if( $compile_opt == "") then  
+  set scriptName     = $rootdir/$name/$version/$exp_name/run
+  set outputDir      = %(output_root)s/$name/$version/$exp_name
+  set diagTable      = %(diagTable)s
+  set namelist       = $rootdir/$name/$version/$exp_name/namelists
+  set dataTable      = %(dataTable)s
+  set fieldTable     = %(fieldTable)s
+  set gridSpec       = %(gridSpec)s
+  set initCond       = %(initCond)s
+  set inputData      = %(inputData)s
+  set executable     = $rootdir/$name/exec.$platform.$version/fms.x
+  else
+  set scriptName     = $rootdir/$name/$version.$compile_opt/$exp_name/run
+  set outputDir      = %(output_root)s/$name/$version.$compile_opt/$exp_name
+  set diagTable      = %(diagTable2)s
+  set namelist       = $rootdir/$name/$version.$compile_opt/$exp_name/namelists
+  set dataTable      = %(dataTable2)s
+  set fieldTable     = %(fieldTable2)s
+  set gridSpec       = %(gridSpec2)s
+  set initCond       = %(initCond2)s
+  set inputData      = %(inputData)s
+  set executable     = $rootdir/$name/exec.$platform.$version.$compile_opt/fms.x
+  endif
+  set npes           = %(npes)s
+  set monthslist     = %(monthslist)s
+  set dayslist       = %(dayslist)s
+  set dt_atmos       = %(dt_atmos)s
+  set numSubmissions = 1
+  alias time_stamp   "$rootdir/../bin/time_stamp.csh" 
+  alias mppnccombine "$rootdir/../bin/mppnccombine.$platform"
+  alias banner       "$rootdir/../bin/banner"
+
+  limit stacksize unlimited
+  limit coredumpsize unlimited
+
+%(compiler_info)s
+
+########################################################################
+#---------- only highly premeditated user changes below here -----------
+########################################################################
+  if ( $#dayslist != $#monthslist ) then
+    unset echo
+    echo "ERROR: dayslist and monthslist must be lists of the same length"
+    exit 1
+  endif
+  set runsPerScript = $#dayslist
+  banner $name
+  banner ${npes}pe_${runsPerScript}run
+
+# --- set up variables for looping and reloading ---
+  set irun = 1
+  set ireload = 1
+  set reload_file = $outputDir/ascii/reload_commands
+
+  if ( -d $outputDir )  then
+    if ( -f $reload_file ) then
+      if ( -r $reload_file ) then
+        source $reload_file
+      else
+        unset echo
+        echo "ERROR: reload file is not readable: $reload_file"
+        exit 1
+      endif
+    endif
+  else
+    mkdir -p $outputDir
+  endif
+  if ( ! -d $outputDir/ascii ) mkdir $outputDir/ascii
+
+# --- you may wish to make sure executable is up to date ---
+  cd $executable:h
+  make
+  if ( $status != 0 ) then
+    unset echo
+    echo "ERROR: make failed"
+    exit 1
+  endif
+
+# --- set up working directory structure ---
+  if ( ! -d $work ) mkdir -p $work 
+
+  unset echo
+  if ( ! -e $work ) then
+    echo "ERROR: working directory could not be created: $work"
+    exit 1
+  else if ( ! -d $work ) then
+    echo "ERROR: $work exists, but is not a directory."
+    exit 1
+  else if ( ! -r $work ) then
+    echo "ERROR: working directory is not readable: $work"
+    exit 1
+  else if ( ! -w $work ) then
+    echo "ERROR: working directory is not writable: $work"
+    exit 1
+  endif
+  set echo
+
+  cd $work
+  rm -rf $work/* >& /dev/null
+
+  if ( ! -d INPUT ) mkdir INPUT 
+  mkdir RESTART
+
+  unset echo
+  if ( ! -e INPUT ) then
+    echo "ERROR: input directory could not be created: $work/INPUT/"
+    exit 1
+  else if ( ! -d INPUT ) then
+    echo "ERROR: $work/INPUT/ exists, but is not a directory."
+    exit 1
+  else if ( ! -r INPUT ) then
+    echo "ERROR: input directory is not readable: $work/INPUT/"
+    exit 1
+  else if ( ! -w INPUT ) then
+    echo "ERROR: input directory is not writable: $work/INPUT/"
+    exit 1
+  endif
+  if ( ! -e RESTART ) then
+    echo "ERROR: restart directory could not be created: $work/RESTART/"
+    exit 1
+  else if ( ! -d RESTART ) then
+    echo "ERROR: $work/RESTART/ exists, but is not a directory."
+    exit 1
+  else if ( ! -r RESTART ) then
+    echo "ERROR: restart directory is not readable: $work/RESTART/"
+    exit 1
+  else if ( ! -w RESTART ) then
+    echo "ERROR: restart directory is not writable: $work/RESTART/"
+    exit 1
+  endif
+  %(echo_opt)s
+
+# --- copy to INPUT,WORKDIR ---
+  banner get_data
+
+  cd INPUT
+  if ( $?gridSpec ) then
+    if ( "$gridSpec" != "" ) then
+      if ( ! -e $gridSpec ) then
+        unset echo
+        echo "ERROR: exchange grid file does not exist: $gridSpec"
+        exit 1
+      else if ( ! -f $gridSpec ) then
+        unset echo
+        echo "ERROR: exchange grid file is not a regular file: $gridSpec"
+        exit 1
+      else if ( ! -r $gridSpec ) then
+        unset echo
+        echo "ERROR: exchange grid file is not readable: $gridSpec"
+        exit 1
+      endif
+      if ( $gridSpec:e == gz ) then
+         gunzip -c $gridSpec > grid_spec.nc
+      else
+         cp $gridSpec grid_spec.nc
+      endif
+    endif
+  endif
+
+  if ( $?initCond ) then
+    if ( "$initCond" != "" ) then
+      if ( ! -e $initCond ) then 
+        unset echo
+        echo "ERROR: atmospheric restart file does not exist: $initCond"
+        exit 1
+      else if ( ! -f $initCond ) then 
+        unset echo
+        echo "ERROR: atmospheric restart file is not a regular file: $initCond"
+        exit 1
+      else if ( ! -r $initCond ) then 
+        unset echo
+        echo "ERROR: atmospheric restart file is not readable: $initCond"
+        exit 1
+      endif
+      if ( $initCond:e == gz ) then
+         cp $initCond $initCond:t
+         set initCond = $initCond:t
+         gunzip $initCond
+         set initCond = $initCond:r
+      endif
+      if ( $initCond:e == tar ) then
+        tar -xvf $initCond
+      else if ( $initCond:e == cpio ) then
+        cpio -ic < $initCond >& /dev/null
+      endif
+    endif
+  endif
+
+  if ( $?inputData ) then
+    foreach datafile ( $inputData )
+      if ( ! -e $datafile ) then
+        unset echo
+        echo "ERROR: data file does not exist: $datafile"
+        exit 1
+      else if ( ! -f $datafile ) then
+        unset echo
+        echo "ERROR: data file is not a regular file: $datafile"
+        exit 1
+      else if ( ! -r $datafile ) then
+        unset echo
+        echo "ERROR: data file is not readable: $datafile"
+        exit 1
+      endif
+      if ( $datafile:e == gz ) then
+         cp $datafile $datafile:t
+         set datafile = $datafile:t
+         gunzip $datafile
+         set datafile = $datafile:r
+      endif
+      if ( $datafile:e == tar ) then
+        tar -xvf $datafile
+      else if ( $datafile:e == cpio ) then
+        cpio -ic < $datafile >& /dev/null
+      else
+#        if ( ! -e $datafile:t ) cp $datafile .
+        if ( ! -e $datafile:t ) ln -s $datafile .
+      endif
+    end
+  endif
+
+  cd $work
+
+  if ( $?diagTable ) then
+    if ( "$diagTable" != "" ) then
+      if ( ! -e $diagTable ) then
+        unset echo
+        echo "ERROR: diagnostics table does not exist: $diagTable"
+        exit 1
+      else if ( ! -f $diagTable ) then
+        unset echo
+        echo "ERROR: diagnostics table is not a regular file: $diagTable"
+        exit 1
+      else if ( ! -r $diagTable ) then
+        unset echo
+        echo "ERROR: diagnostics table is not readable: $diagTable"
+        exit 1
+      endif
+      cp $diagTable diag_table
+    endif
+  endif
+
+  if ( $?dataTable ) then
+    if ( "$dataTable" != "" ) then
+      if ( ! -e $dataTable ) then
+        unset echo
+        echo "ERROR: data table does not exist: $dataTable"
+        exit 1
+      else if ( ! -f $dataTable ) then
+        unset echo
+        echo "ERROR: data table is not a regular file: $dataTable"
+        exit 1
+      else if ( ! -r $dataTable ) then
+        unset echo
+        echo "ERROR: data table is not readable: $dataTable"
+        exit 1
+      endif
+      cp $dataTable data_table
+    endif
+  endif
+  touch data_table
+
+  if ( $?fieldTable ) then
+    if ( "$fieldTable" != "" ) then
+      touch field_table
+      foreach file ( $fieldTable )
+        if ( ! -e $file ) then
+          unset echo
+          echo "ERROR: field table does not exist: $file"
+          exit 1
+        else if ( ! -f $file ) then
+          unset echo
+          echo "ERROR: field table is not a regular file: $file"
+          exit 1
+        else if ( ! -r $file ) then
+          unset echo
+          echo "ERROR: field table is not readable: $file"
+          exit 1
+        endif
+        cat $file >> field_table
+      end
+    endif
+  endif
+  
+#  echo $input_nml | tr \$ "\n" > $work/input.nml
+#  if ( ! -e $namelist ) then
+#    unset echo
+#    echo "ERROR: namelist file does not exist: $namelist"
+#    exit 1
+#  else if ( ! -f $namelist ) then
+#    unset echo
+#    echo "ERROR: namelist file is not a regular file: $namelist"
+#    exit 1
+#  else if ( ! -r $namelist ) then
+#    unset echo
+#    echo "ERROR: namelist file is not readable: $namelist"
+#    exit 1
+#  endif
+#  cat $namelist >> input.nml
+
+  if ( ! -e $executable ) then
+    unset echo
+    echo "ERROR: executable does not exist: $executable"
+    exit 1
+  else if ( ! -f $executable ) then
+    unset echo
+    echo "ERROR: executable is not a regular file: $executable"
+    exit 1
+  else if ( ! -x $executable ) then
+    unset echo
+    echo "ERROR: executable does not have correct permissions: $executable"
+    exit 1
+  endif
+  cp $executable $executable:t
+
+################## begin loop over $runsPerScript ####################
+  while ($irun <= $runsPerScript)
+
+    set days = $dayslist[$irun]
+    set months = $monthslist[$irun]
+
+    #all_namelists
+cp $namelist input.nml    
+cat >> input.nml <<EOF
+ &main_nml
+         calendar = '%(calendar)s',
+         months   = $months,
+         days     = $days,
+         dt_atmos = $dt_atmos /
+EOF
+
+    banner loop_$irun/$runsPerScript
+
+    #FOR MPI (libMPI)
+
+    banner run
+    
+    set run = "mpirun -np $npes"
+    $run ./$executable:t > fms.out
+    
+    if ( $status != 0 ) then
+      set cores_dumped = 0
+      foreach corefile (`ls core*`)
+        echo "cvdump of core file $corefile" > $corefile.out
+        cvdump $executable:t $corefile >> $corefile.out &
+        set cores_dumped = `expr $cores_dumped + 1`
+      end
+      unset echo
+      #wait for background jobs to complete
+      wait
+      if ( $cores_dumped != 0 ) then
+        cat core*.out >> fms.out
+        echo "ERROR: in mpirun, core dumped: run $ireload, loop $irun" 
+      else
+        echo "ERROR: in mpirun, no cores produced: run $ireload, loop $irun"
+        #exit 1
+      endif
+      set MPI_FAIL
+      set outputDir = ${outputDir}_crash
+      if ( ! -d $outputDir/ascii ) mkdir -p $outputDir/ascii
+      cat fms.out
+    else
+      cat fms.out
+    endif
+    
+#   --- postprocessing for the standalone f90 program ---
+    if $name == "f90" then
+      cp *.out $scriptName:h
+      mv *.out $outputDir/ascii
+      set archive_files = `ls *.nc`
+      if ( $#archive_files > 0 ) then
+        if ( ! -d $outputDir/history ) mkdir -p $outputDir/history
+        mv *.nc $outputDir/history
+      endif
+      exit 0
+    endif
+    
+#   --- generate date for file names ---
+    set date_name = `time_stamp -ef digital`
+    if ( $date_name == "" ) set date_name = %(other_time_stamp)s
+    if ( -f time_stamp.out ) rm -f time_stamp.out
+
+#   --- save ascii output files to local disk ---
+    foreach out (`ls *.out`)
+      mv $out $outputDir/ascii/$date_name.$out
+    end
+    foreach results (`ls *.results`)
+      mv $results $outputDir/ascii/$date_name.$results
+    end 
+    cd $outputDir/ascii
+    #if ( -e $outputDir/ascii/ascii_out.cpio ) then
+    #  ls *\.out *\.results | cpio -oAO ascii_out.cpio
+    #else
+    #  ls *\.out *\.results | cpio -o > ascii_out.cpio
+    #endif
+    if ( -e $outputDir/ascii/ascii_out.tar ) then
+      tar -rf ascii_out.tar `ls *\.out *\.results`
+    else
+      tar -cf ascii_out.tar `ls *\.out *\.results`
+    endif
+    rm -rf *\.out *\.results
+    cd $work
+
+#   --- save/archive restart files ---
+    cd RESTART
+    set resfiles = `ls *.res *.nc`
+    if ( $#resfiles > 0 ) then
+#     --- filename for tar of output restart files ---	
+      set restart_file = $outputDir/restart/$date_name.tar
+      if ( ! -d $restart_file:h ) mkdir -p $restart_file:h
+      unset echo
+      if ( ! -e $restart_file:h ) then
+	echo "ERROR: restart directory could not be created: $restart_file:h"
+        exit 1
+      else if ( ! -d $restart_file:h ) then
+	echo "ERROR: $restart_file:h exists, but is not a directory."
+        exit 1
+      else if ( ! -w $restart_file:h ) then
+	echo "ERROR: restart directory is not writable: $restart_file:h"
+        exit 1
+      endif
+      set echo
+#     --- also save namelist and diag_table, data_table, field_table ---
+      cp $work/input.nml .
+      cp $work/*_table .
+      set files = ( $resfiles input.nml *_table )
+      tar -cf $restart_file:t `ls $files`
+      mv $restart_file:t $restart_file
+#     --- set up restart for next run ---
+      if ( $irun < $runsPerScript ) then
+         rm -f ../INPUT/*.res 
+         mv -f *.res  ../INPUT
+         mv -f *.nc  ../INPUT
+      endif
+    endif
+    cd $work
+
+#   --- save netcdf and data files ---
+    if ( ! -d $outputDir/history ) mkdir -p $outputDir/history
+    unset echo
+    if ( ! -e $outputDir/history ) then
+      echo "ERROR: history directory could not be created: $outputDir/history"
+      exit 1
+    else if ( ! -d $outputDir/history ) then
+      echo "ERROR: $outputDir/history exists, but is not a directory."
+      exit 1
+    else if ( ! -w $outputDir/history ) then
+      echo "ERROR: history directory is not writable: $outputDir/history"
+      exit 1
+    endif
+    set echo
+
+    foreach suffix (nc data)
+      foreach file ( `ls *.$suffix *.$suffix.????` )
+         mv $file $date_name.$file
+      end
+      foreach donefile ( `ls *.$suffix` )
+         mv $donefile $outputDir/history/$donefile
+      end
+      foreach ncfile ( `ls *.$suffix.0000` )
+        mppnccombine $ncfile:r
+        if ( $status != 0 ) then
+          cp *.$suffix.???? $outputDir/history
+          cp $ncfile:r $outputDir/history/$ncfile:r
+          unset echo
+          echo "ERROR: in mppnccombine, run $numSubmissions, loop $runsPerScript"
+          echo "ERROR: individual output files copied to $outputDir/history"
+          exit 1
+        endif
+        cp $ncfile:r $outputDir/history/$ncfile:r
+      end
+    end
+    \rm *.nc*
+
+#   --- terminate script if mpirun crashed ---
+    if ( $?MPI_FAIL ) then
+      unset echo
+      echo "ERROR: in mpirun, core dumped: run $ireload, loop $irun" 
+      echo "ERROR: Any output that may have been generated " 
+      echo "       is in $outputDir" 
+      exit 1
+    endif
+
+#   --- terminate script if there are no restart files ---
+    if ( $#resfiles == 0 ) then
+      unset echo
+      echo "ERROR: no restart files exist, run $ireload, loop $irun" 
+      exit 1
+    endif
+
+#   --- write new reload information ---
+    @ irun++
+
+    if ( -f $reload_file ) mv -f $reload_file $reload_file"_prev"
+    if ( $irun <= $runsPerScript ) then
+      echo "set irun         =  $irun"          >  $reload_file
+    else
+      @ ireload++
+      echo "set irun         =  1"              >  $reload_file
+    endif
+
+    echo   "set ireload      =  $ireload"       >> $reload_file
+    echo   "set initCond     =  $restart_file"  >> $reload_file
+
+  end
+################# loop over $runsPerScript ended ###################
+
+# --- reload script if necessary ---
+  if ( $ireload <= $numSubmissions ) then
+    banner reloading
+    if ( -f $scriptName ) then
+      #qsub $scriptName
+      $scriptName
+    else
+      unset echo
+      echo "WARNING: runscript does not exist, run $ireload, loop $irun" 
+      echo "         $scriptName could not be resubmitted" 
+    endif
+  endif
+
+unset echo
+banner end_of_run
+echo "NOTE: Natural end-of-script for $scriptName."

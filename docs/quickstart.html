@@ -1,0 +1,367 @@
+<html>
+
+<title>Quickstart Guide: Idealized Global Atmospheric Models with Spectral Dynamics</title>
+<h2>Idealized Global Spectral Atmospheric Models</h2>
+
+<body>
+
+<p><strong>Table of Contents</strong></p>
+
+<dl>
+<dt><a href="#Overview">1. Overview</a></dt>
+<dt><a href="#Description_of_models">2. Description of models</a></dt>
+<dd>
+<dl> 
+    <dt><a href="#Barotropic_model">2.1. Barotropic model</a></dt>
+    <dd>
+    <dl> 
+        <dt><a href="#Basic_barotropic_model">2.1.1 Basic barotropic model</a></dt>
+        <dt><a href="#Barotropic_model_with_random_stirring">2.1.2 Barotropic model with random stirring</a></dt>
+    </dl>
+    </dd>
+    <dt><a href="#Shallow_water_model">2.2. Shallow water model</a></dt>
+    <dd>
+    <dl> 
+        <dt><a href="#Basic_shallow_water_model">2.2.1 Basic shallow water model</a></dt>
+    </dl>
+    </dd>
+    <dt><a href="#Model_with_full_spectral_dynamics">2.3. Model with full spectral dynamics</a></dt>
+    <dd>
+    <dl> 
+         <dt><a href="#HSt42">2.3.1 HSt42</a></dt>
+         <dt><a href="#Polvani_2004">2.3.2 Polvani_2004</a></dt>
+         <dt><a href="#Jablonoski_2006">2.3.3 Jablonoski_2006</a></dt>
+         <dt><a href="#Polvani_2007_LC1">2.3.4 Polvani_2007_LC1</a></dt>
+    </dl>
+    </dd>
+</dl>
+</dd>
+<dt><a href="#Acquire_the_Source_Code_and_Runscripts">3. Acquire the Source Code and Runscripts</a></dt>
+<dt><a href="#Run_the_Model">4. Run the Model</a></dt>
+    <dd>
+    <dl> 
+    <dt><a href="#The_Sample_Runscripts">4.1. The Sample Runscripts</a></dt>
+    <dt><a href="#The_compilation_templates">4.2. The compilation templates</a></dt>
+    <dt><a href="#Grid_decomposition">4.3. Grid decomposition</a></dt>
+    <dt><a href="#Restarting_and_cold-starting">4.4. Restarting and cold-starting</a></dt>
+    <dd>
+    <dl> 
+         <dt><a href="#restarting">4.4.1. restarting</a></dt>
+         <dt><a href="#cold-starting">4.4.2. cold-starting</a></dt>
+    </dl>
+    </dd>
+    <dt><a href="#Initial_condition_vs_forcing_experiments">4.5. Initial condition vs forcing experiments</a></dt>
+    <dt><a href="#Control_of_model_time_and_length_of_integration">4.6. Control of model time and length of integration</a></dt>
+    <dt><a href="#diag_table">4.7. diag_table</a></dt>
+    <dt><a href="#field_table">4.8. field_table</a></dt>
+    </dl>
+    </dd>
+<dt><a href="#Examine_the_Output"> 5. Examine the Output</a></dt>
+</dl>
+
+<a name="Overview"></a>
+<h3>1. Overview</h3>
+<p>
+ A global spectral atmospheric model decomposes the flow into spherical harmonic components.
+ It provides an elegant algorithm for atmospheric modeling on global scales. It is not the
+ algorithm currently favored for comprehensive climate modeling at GFDL, due to the difficulty
+ of exactly conserving total mass of tracers and of dry air, and due to problems associated
+ with Gibbs' ripples created by trying to represent the Earth's topography with a finite set
+ of spherical harmonics. However, the spectral model continues to be useful for research with
+ idealized models and for education.
+</p>
+<a name="Description_of_models"></a>
+<h3>2. Description of models</h3>
+
+<a name="Barotropic_model"></a>
+<h4>2.1. Barotropic model</h4>
+<p>
+  The barotropic model solves the vorticity equation for the evolution of a two-dimensional
+  non-divergent flow on the surface of a sphere. For documentation of the Fortran code and tunable
+  namelist parameters, see http://www.gfdl.noaa.gov/barotropic-dynamics
+  For a full description of the model and algorithms, see: <a href="http://www.gfdl.noaa.gov/cms-filesystem-action/user_files/pjp/barotropic.pdf" class="pdf">The barotropic vorticity equation</a>
+</p>
+<a name="Basic_barotropic_model"></a>
+<h4>2.1.1 Basic barotropic model</h4>
+<p>
+  Default setting generates the free evolution of an eddy of a given zonal wavenumber on a stable
+  mid-latitude zonal jet, as in Held and Phillipps, 1986: <a href="http://www.gfdl.noaa.gov/bibliography/related_files/ih8704.pdf" class="pdf">Linear and Nonlinear barotropic decay on the Sphere.</a> Journal of the Atmospheric Sciences, 44(1), 200-207.
+  Optionally, two passive tracers may be included, one advected with the spectral
+  algorithm and another advected with a piecewise linear finite-volume scheme.
+</p>
+<a name="Barotropic_model_with_random_stirring"></a>
+<h4>2.1.2 Barotropic model with random stirring</h4>
+<p>
+  An alternative setting is available that illustrates how random stirring can create zonal jets.,
+  following Vallis,G.K., E.P.Gerber, P.J.Kushner, and B.A.Cash, 2004: 
+  <a class="pdf" href="http://www.gfdl.noaa.gov/cms-filesystem-action/user_files/pjp/gkv0401.pdf"> 
+        A Mechanism and Simple Dynamical Model of the North Atlantic Oscillation and 
+        Annular Modes.</a> Journal of the Atmospheric Sciences, 61(3), 264-280.
+</p>
+<a name="Shallow_water_model"></a>
+<h4>2.2. Shallow water model</h4>
+<p>
+  The shallow water model solves for the evolution of a uniform density, incompressible flow on a sphere in the hydrostatic approximation
+  (valid when the horizontal scale of the motion is large compared to the depth of the fluid).
+  For documentation of the Fortran code and tunable namelist parameters, see: <a href="http://www.gfdl.noaa.gov/documentation-of-dynamics-code">documentation-of-dynamics-code</a>
+  For a full description of the model and algorithms, see: <a class="pdf" href="http://www.gfdl.noaa.gov/cms-filesystem-action/user_files/pjp/shallow.pdf">The shallow water equations</a>
+</p>
+<a name="Basic_shallow_water_model"></a>
+<h4>2.2.1 Basic shallow water model</h4>
+<p>
+  The response to heating/cooling in the atmosphere in such a model is mimicked by specifying mass sources/sinks.
+  Default mass sources/sinks provide relaxation of height to a profile which has a ridge at the equator and an isolated hump in mid-latitudes,
+  representing heating in the intertropical Convergence Zone and monsoonal heating, respectively, with background radiatie cooling.
+</p>
+<a name="Model_with_full_spectral_dynamics"></a>
+<h4>2.3. Model with full spectral dynamics</h4>
+<p>
+  For documentation of the Fortran code and tunable namelist parameters, see http://www.gfdl.noaa.gov/documentation-of-spectral-dynamics-code
+  For a full description of the model and algorithms, see: <a class="pdf" href="http://www.gfdl.noaa.gov/cms-filesystem-action/user_files/pjp/spectral_core.pdf">Equations and numerics of the spectral dynamics code</a>
+</p>
+<a name="HSt42"></a>
+<h4>2.3.1 HSt42</h4>
+<p>
+  The model setup follows the standard described in <a class="pdf" href="http://www.gfdl.noaa.gov/bibliography/related_files/ih9401.pdf">A proposal for the intercomparison of the dynamical cores of atmospheric general circulation models</a> Bulletin of the American Meteorological Society, 75(10), 1825-1830.
+  Several default settings are provided. for running in climate mode (force, dissipative flow in which one is interesting in the long term behavior,
+  independent of initial conditions) and in initial value model (idealized initial conditions, illustrating the development of midlaittude cyclones)
+</p>
+<a name="Polvani_2004"></a>
+<h4>2.3.2 Polvani_2004</h4>
+  Sets up the initial value problem describe in Polvani, L. M., R. K. Scott, and S. J. Thomas, 2004: <a class="pdf" href="http://www.gfdl.noaa.gov/cms-filesystem-action/user_files/pjp/polvani_etal-mwr-2004.pdf">Numerically Converged Solutions of the Global Primitive Equations for Testing the Dynamical Core of Atmospheric GCMs</a> Mon. Weather Rev., 132, 2539-2552.
+</p>
+
+<a name="Jablonoski_2006"></a>
+<h4>2.3.3 Jablonoski_2006</h4>
+<p>
+  Is an alternative initial value problem of the same style:
+Jablonowski, C. and D. L. Williamson, 2006: <a href="http://www.gfdl.noaa.gov/cms-filesystem-action/user_files/pjp/qj_jablonowski_williamson_2006.pdf" class="pdf">A baroclinic instability test case for atmospheric model dynamical cores</a> Q.J.R. Meteorol. Soc., 2006, 132, 2943-297
+</p>
+<a name="Polvani_2007_LC1"></a>
+<h4>2.3.4 Polvani_2007_LC1</h4>
+<p>
+  Adds a detailed specification of idealized tracers in the environnment of a developing baroclinic wave:
+ Polvani, L. M. and J. G. Esler, 2007: <a href="http://www.gfdl.noaa.gov/cms-filesystem-action/user_files/pjp/polvani_esler-jgr-2007.pdf" class="pdf">Transport and mixing of chemical air masses in idealized baroclinic life cycles</a> J. Geophys. Res., 112, D23102, doi:10.1029/2007JD008555.
+</p>
+<a name="Acquire_the_Source_Code_and_Runscripts"></a>
+<h4>3. Acquire the Source Code and Runscripts</h4>
+<p>
+The Flexible Modeling System development team at GFDL uses a local implementation
+of GForge to serve FMS software, located at https://fms.gfdl.noaa.gov/gf
+In order to obtain the source code, you must <a target="_top" href="https://fms.gfdl.noaa.gov/gf/account/?action=UserAdd">register</a>
+as an FMS user on our software server. After submitting the registration form on the software server, you should receive an automatically
+generated confirmation email within a few minutes. Clicking on the link in the email confirms the creation of your account.
+</p>
+<p>
+After your account has been created, you should <a target="_top" href="https://fms.gfdl.noaa.gov/gf/account/?action=Login&amp;amp;redirect=/gf/my/">log in</a>
+and <a href="https://fms.gfdl.noaa.gov/extra/request-project-access.cgi">request access</a>
+to the Spectral Atmospheric Idealized Models project. Once the FMS project administrator grants you access,
+you will receive a second e-mail notification. This email requires action on the part of the project administrator and thus may take longer to arrive.
+The email will contain a software access password along with instructions for obtaining the release package, which are described below.
+</p>
+<p>
+You may download the release package from <a target="_top" href="https://fms.gfdl.noaa.gov/gf/project/spectral_models/frs">https://fms.gfdl.noaa.gov/gf/project/spectral_models/frs</a>
+Click on "idealized_spectral_models.tar.gz" to download.
+</p>
+<a name="Run_the_Model"></a>
+<h3>4. Run the Model</h3>
+
+<a name="The_Sample_Runscripts"></a>
+<h4>4.1. The Sample Runscripts</h4>
+<p>
+ This release includes compile and run scripts for the idealized models in the exp directory.
+ It is organized into three different models: full_dynamics, barotropic and shallow.
+ Each of these involves a different set of source code, although there is much code in common.
+</p>
+<p>
+ For each of these models, one or more experiments may be run. The experiment is chosen at
+ the top of the run scripts. The experiment is determined only by the input data, using the
+ same model executable.
+</p>
+<p>
+ In addition, for each model there are three pairs of compile and run scripts.
+ Each of these runs on a different platform. The platforms are:
+<ul>
+<li>The gaea machine at ORNL.</li>
+<li>The workstation environment at GFDL, using the mpi software.</li>
+<li>The workstation environment at GFDL, without the mpi software, running on a single processor.</li>
+</ul>
+</p>
+<p>
+ It is not likely that any of these will run out-of-the-box on some other platform, but
+ comparison between the three pairs of scripts shows what sort of things need modification
+ when platforms change. See section 5.2 below.
+</p>
+<p>
+ The run script:
+<ul>
+<li>Creates a working directory where the model will be run.</li>
+<li>Creates or copies the required input data for the particular experiment chosen into the working directory.</li>
+<li>Runs the model.</li>
+<li>Combines distributed output and renames the output files using the timestamp.</li>
+</ul>
+</p>
+<p>
+ Note that the directory paths and file paths are variables. They are initially set to
+ correspond to the directory structure as it exists after extraction from the tar file,
+ but are made variables to accommodate changes to this directory structure.
+</p>
+<p>
+ The directory path most likely to need changing is workdir.
+ workdir is a temporary directory where the model will run. A large amount of data
+ will be copied into the work directory, and output from the model is also written
+ to the work directory. workdir must be large enough to accommodate all of this.
+ The input data is approximately 20GB and model output is potentially even larger.
+</p>
+<a name="The_compilation_templates"></a>
+<h4>4.2. The compilation templates</h4>
+<p>
+If you encounter a compile error when executing the compile script, first
+check whether you have correctly customized your mkmf template. The scripts use
+the mkmf utility, which creates a Makefile to facilitate compilation. The mkmf
+utility uses a platform-specific template for setting up system and platform
+dependent parameters. Sample templates for various platforms are provided in the
+bin directory. You may need to consult your system administrator to set up a
+compilation template for your platform and ensure the locations for system
+libraries are defined correctly. For documentation on the use of mkmf, see the
+file named "mkmf.html", which is supplied with this package
+</p>
+<a name="Grid_decomposition"></a>
+<h4>4.3. Grid decomposition</h4>
+<p>
+  The spectral model decomposes the horizontal grid into latitude bands with each
+band assigned to a processor. When 2 processors are used it is decomposed into
+northern and southern hemispheres.
+The number of processors that may be used is restricted such that lat_max/npes must be a multiple of 2.
+For example, for t42 resolution there are 64 latitudes so that the choices for npes are 1,2,4,8,16,32
+  The diagnostic output is distributed, that is, each processor writes its own files.
+The processor number is appended to the file name. For example, a diagnostic file named "atmos_daily.nc"
+would appear as these four files when npes=4:<br>
+atmos_daily.nc.0000<br>
+atmos_daily.nc.0001<br>
+atmos_daily.nc.0002<br>
+atmos_daily.nc.0003
+</p>
+<p>
+A tool is provided to combine these distributed files into files of data on a single grid.
+Combining the four files shown above would result in a single file named "atmos_daily.nc"
+</p>
+
+<a name="Restarting_and_cold-starting"></a>
+<h4>4.4  Restarting and cold-starting</h4>
+
+<a name="restarting"></a>
+<h4>4.4.1 Restarting the model to continue a previous integration</h4>
+<p>
+  Restart files are written to a sub-directory, named RESTART, off the working directory.
+Information about the state of the model at the point of termination is contained
+in these files. Each component model and/or sub-component may have restart files.
+To continue a previous integration these files are put in the INPUT directory.
+They are read at initialization to restore the state of the model as it was at
+termination of the previous integration.
+</p>
+
+<a name="cold-starting"></a>
+<h4>4.4.2 Cold-starting the model</h4>
+<p>
+  If a component and/or sub-component does not find its restart files in the INPUT
+directory then it performs a default initialization, also referred to as a cold-start.
+The default initialization of each component is required to be compatible with other
+model components, but otherwise is entirely at the discretion of the developer(s). 
+</p>
+<p>
+  The atmospheric models typically fill the model fields with constant values for a
+cold-start. The result is a model state that is very flat and far away from anything
+scientifically interesting. As a result, a cold-started model needs to be spun-up.
+</p>
+
+<a name="Initial_condition_vs_forcing_experiments"></a>
+<h4>4.5  Initial condition vs forcing experiments</h4>
+<p>
+  The experiments included with this package can be categorized as either initial
+condition or forcing experiments. The initial condition experiments are initialized
+with a perturbation on top of some stable basic flow. The forcing experiments are
+initialized with either a quiescent state or some stable basic flow, and evolve
+as the forcing exerts its influence. These are typically integrated longer than the
+initial condition experiments and are more likely to be candidates for stopping and
+restarting.
+</p>
+<p>
+The names of the initial condition experiments included with this package are:
+<ul>
+<li>t85barotropic</li>
+<li>t42_polvani_2004</li>
+<li>t42_polvani_2007_LC1</li>
+<li>t42_jablonowski_2006</li>
+</ul>
+</p>
+<p>
+The names of the forcing experiments included with this package are:
+<ul>
+<li>t85barotropic_stirring</li>
+<li>t85shallow</li>
+<li>HSt42</li>
+</ul>
+</p>
+
+<a name="Control_of_model_time_and_length_of_integration"></a>
+<h4>4.6. Control of model time and length of integration</h4>
+<p>
+ The length of integration is set by setting days, hours, minutes and seconds
+ in main_nml. The default integration period is zero, so it must be set.
+</p>
+<p>
+ The model time starts at zero by default. It can be changed by setting current_time
+ in main_nml, but this is not recommended. current_time is an array of four elements
+ representing days, hours, minutes and seconds. The model time is saved with the
+ restart data (in atmos_model.res). Upon restarting, the model time will be read from
+ atmos_model.res and any setting via namelist will be ignored. 
+</p>
+<p>
+ The second line of diag_table is an initial date, by default a string of six zeros. 
+ This is the model initial time. The six zeros represent years, months, days, hours, minutes and seconds.
+ years and months must be zero. The others should always be equal to what is set for current_time.
+ The date in diag_table is intended to be used only for the time axis of the diagnostic output files,
+ but unfortunately this standard has not been strictly adhered to. If it is not equal to that
+ set for current_time the results are unpredictable.
+</p>
+
+<a name="diag_table"></a>
+<h4>4.7  diag_table</h4>
+<p>
+ The diagnostic output is controlled via the diagnostics table, which is named "diag_table".
+ For documentation on the use of diag_table, see the file named "diag_table.html",
+ which is supplied with this package.
+</p>
+
+<a name="field_table"></a>
+<h4>4.8  field_table</h4>
+<p>
+ Aside from the model's required prognostic variables; velocity, pressure,
+ temperature and humidity, the model may or may not have any number of additional
+ tracers. Tracers are advected by the dynamical code, but do not feed back on the
+ model solution. Tracers are specified in field_table. For each tracer, the field_table
+ specifies the method of advection, convection, and the tracers source and sinks.
+</p>
+<p>
+ For a more thorough description of field_table, see the file named "field_manager.html",
+ which is supplied with this package.
+</p>
+
+<a name="Examine_the_Output"></a>
+<h3>5. Examine the Output</h3>
+<p>
+ You may download sample output data for comparison at:
+ <a href="ftp://ftp.gfdl.noaa.gov/perm/pjp/Spectral_Idealized_Atmospheric_Models/sample_output.tar.gz">ftp://ftp.gfdl.noaa.gov/perm/pjp/Spectral_Idealized_Atmospheric_Models/sample_output.tar.gz</a>
+ The size of the sample output, after unzipping, is 474 MB.
+ This output was generated on a workstation at GFDL.
+ The file output.tar.gz contains three directories: ascii, history and restart.
+ The ascii directory contains text output of the model including stdout and log messages.
+ The history directory contains netCDF diagnostic output, governed by your entries in
+ the diag_table. History and ascii files are labeled with the timestamp corresponding to
+ the model time at the beginning of execution. The restart directory contains files which
+ describe the state of the model at termination. To restart the model running from this
+ state, these restart files are moved to the INPUT directory to serve as the initial
+ conditions for your next run. 
+</p>
+</html>

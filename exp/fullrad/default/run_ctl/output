@@ -1,0 +1,266 @@
+
+#######  #     #  #        #        ######      #     ######   
+#        #     #  #        #        #     #    # #    #     #  
+#        #     #  #        #        #     #   #   #   #     #  
+#####    #     #  #        #        ######   #     #  #     #  
+#        #     #  #        #        #   #    #######  #     #  
+#        #     #  #        #        #    #   #     #  #     #  
+#         #####   #######  #######  #     #  #     #  ######   
+
+
+ ###    ###   ######   #######          ###   ######   #     #  #     #  
+#   #  #   #  #     #  #               #   #  #     #  #     #  ##    #  
+    #  #   #  #     #  #                   #  #     #  #     #  # #   #  
+ ###      #   ######   #####            ###   ######   #     #  #  #  #  
+    #    #    #        #                   #  #   #    #     #  #   # #  
+#   #   #     #        #               #   #  #    #   #     #  #    ##  
+ ###   #####  #        #######  #####   ###   #     #   #####   #     #  
+
+make: Nothing to be done for 'all'.
+cd /glade/u/home/chen/data/tmp/r8i4n0.05-17@20:23:48.id50578
+if ( ! -d INPUT ) mkdir INPUT
+mkdir INPUT
+mkdir RESTART
+unset echo
+
+ #####   #######  #######         ######      #     #######     #     
+#     #  #           #            #     #    # #       #       # #    
+#        #           #            #     #   #   #      #      #   #   
+#  ####  #####       #            #     #  #     #     #     #     #  
+#     #  #           #            #     #  #######     #     #######  
+#     #  #           #            #     #  #     #     #     #     #  
+ #####   #######     #     #####  ######   #     #     #     #     #  
+
+atmos_model.res
+atmosphere.res.nc
+data_table
+diag_table
+field_table
+input.nml
+mixed_layer.res.nc
+spectral_dynamics.res.nc
+
+#        #######  #######  ######            #          #   ###   
+#        #     #  #     #  #     #          ##         #   #   #  
+#        #     #  #     #  #     #         # #        #        #  
+#        #     #  #     #  ######            #       #      ###   
+#        #     #  #     #  #                 #      #          #  
+#        #     #  #     #  #                 #     #       #   #  
+#######  #######  #######  #        #####  #####  #         ###   
+
+
+######   #     #  #     #  
+#     #  #     #  ##    #  
+#     #  #     #  # #   #  
+######   #     #  #  #  #  
+#   #    #     #  #   # #  
+#    #   #     #  #    ##  
+#     #   #####   #     #  
+
+NOTE from PE     0: MPP_DOMAINS_SET_STACK_SIZE: stack size set to    32768.
+ &MPP_IO_NML
+ HEADER_BUFFER_VAL       =       16384,
+ GLOBAL_FIELD_ON_ROOT_PE = T,
+ IO_CLOCKS_ON    = F,
+ SHUFFLE =           0,
+ DEFLATE_LEVEL   =          -1
+ /
+NOTE from PE     0: MPP_IO_SET_STACK_SIZE: stack size set to     131072.
+NOTE from PE     0: MPP_DOMAINS_SET_STACK_SIZE: stack size set to   600000.
+NOTE from PE     0: diag_manager_mod::diag_manager_init: prepend_date only supported when diag_manager_init is called with time_init present.
+  starting            1  OpenMP threads per MPI-task
+ATMOS MODEL DOMAIN DECOMPOSITION
+  X-AXIS =  128
+  Y-AXIS =    2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+              2   2   2   2   2   2   2   2
+NOTE from PE     0: esfsw_driver_mod: reading solar band data from file INPUT/esf_sw_input_data_n74b18ctm
+NOTE from PE     0: radiation_driver_diag_init: diagnostic field "dynamics", "area" is not in the diag_table
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsch4_2250_12001400.nc
+NOTE from PE     0: MPP_IO_SET_STACK_SIZE: stack size set to     738048.
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsch4_1750_12001400.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsn2o_340_12001400.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsn2o_310_12001400.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsn2o_340_10701200.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsn2o_310_10701200.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsn2o_340_560630.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsn2o_310_560630.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsco2_600_490850.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsco2_360_490850.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsco2_600_490630.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsco2_360_490630.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsco2_600_630700.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsco2_360_630700.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsco2_600_700850.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsco2_360_700850.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsco2_600_43um.nc
+NOTE from PE     0: lw_gases_stdtf_mod: Reading NetCDF formatted input data file: INPUT/cnsco2_360_43um.nc
+ Integration completed through    5 Apr 11   0: 0: 0
+ Integration completed through    5 Jul 20   0: 0: 0
+ Integration completed through    5 Oct 28   0: 0: 0
+ MPP_DOMAINS_STACK high water mark=       30720
+
+Tabulating mpp_clock statistics across     32 PEs...
+
+                                          tmin          tmax          tavg          tstd  tfrac grain pemin pemax
+Total runtime                      8318.084521   8318.084524   8318.084522      0.000001  1.000     0     0    31
+ MPP_STACK high water mark=           0
+ls: No match.
+cp /glade/u/home/chen/data/tmp/r8i4n0.05-17@20:23:48.id50578/input.nml .
+cp /glade/u/home/chen/data/tmp/r8i4n0.05-17@20:23:48.id50578/data_table /glade/u/home/chen/data/tmp/r8i4n0.05-17@20:23:48.id50578/diag_table /glade/u/home/chen/data/tmp/r8i4n0.05-17@20:23:48.id50578/field_table .
+set files = ( atmos_model.res atmosphere.res.nc mixed_layer.res.nc spectral_dynamics.res.nc input.nml *_table )
+ls atmos_model.res atmosphere.res.nc mixed_layer.res.nc spectral_dynamics.res.nc input.nml data_table diag_table field_table
+tar -cf 00060101.tar atmos_model.res atmosphere.res.nc data_table diag_table field_table input.nml mixed_layer.res.nc spectral_dynamics.res.nc
+mv 00060101.tar /glade/u/home/chen/data/fullrad/default/run_ctl/restart/00060101.tar
+if ( 1 < 3 ) then
+rm -f ../INPUT/atmos_model.res
+mv -f atmos_model.res ../INPUT
+mv -f atmosphere.res.nc mixed_layer.res.nc spectral_dynamics.res.nc ../INPUT
+endif
+endif
+cd /glade/u/home/chen/data/tmp/r8i4n0.05-17@20:23:48.id50578
+if ( ! -d /glade/u/home/chen/data/fullrad/default/run_ctl/history ) mkdir -p /glade/u/home/chen/data/fullrad/default/run_ctl/history
+unset echo
+foreach suffix ( nc data )
+foreach file ( `ls *.$suffix *.$suffix.????` )
+ls atmos_4xday.nc.0000 atmos_4xday.nc.0001 atmos_4xday.nc.0002 atmos_4xday.nc.0003 atmos_4xday.nc.0004 atmos_4xday.nc.0005 atmos_4xday.nc.0006 atmos_4xday.nc.0007 atmos_4xday.nc.0008 atmos_4xday.nc.0009 atmos_4xday.nc.0010 atmos_4xday.nc.0011 atmos_4xday.nc.0012 atmos_4xday.nc.0013 atmos_4xday.nc.0014 atmos_4xday.nc.0015 atmos_4xday.nc.0016 atmos_4xday.nc.0017 atmos_4xday.nc.0018 atmos_4xday.nc.0019 atmos_4xday.nc.0020 atmos_4xday.nc.0021 atmos_4xday.nc.0022 atmos_4xday.nc.0023 atmos_4xday.nc.0024 atmos_4xday.nc.0025 atmos_4xday.nc.0026 atmos_4xday.nc.0027 atmos_4xday.nc.0028 atmos_4xday.nc.0029 atmos_4xday.nc.0030 atmos_4xday.nc.0031 atmos_average.nc.0000 atmos_average.nc.0001 atmos_average.nc.0002 atmos_average.nc.0003 atmos_average.nc.0004 atmos_average.nc.0005 atmos_average.nc.0006 atmos_average.nc.0007 atmos_average.nc.0008 atmos_average.nc.0009 atmos_average.nc.0010 atmos_average.nc.0011 atmos_average.nc.0012 atmos_average.nc.0013 atmos_average.nc.0014 atmos_average.nc.0015 atmos_average.nc.0016 atmos_average.nc.0017 atmos_average.nc.0018 atmos_average.nc.0019 atmos_average.nc.0020 atmos_average.nc.0021 atmos_average.nc.0022 atmos_average.nc.0023 atmos_average.nc.0024 atmos_average.nc.0025 atmos_average.nc.0026 atmos_average.nc.0027 atmos_average.nc.0028 atmos_average.nc.0029 atmos_average.nc.0030 atmos_average.nc.0031
+mv atmos_4xday.nc.0000 00060101.atmos_4xday.nc.0000
+end
+mv atmos_4xday.nc.0001 00060101.atmos_4xday.nc.0001
+end
+mv atmos_4xday.nc.0002 00060101.atmos_4xday.nc.0002
+end
+mv atmos_4xday.nc.0003 00060101.atmos_4xday.nc.0003
+end
+mv atmos_4xday.nc.0004 00060101.atmos_4xday.nc.0004
+end
+mv atmos_4xday.nc.0005 00060101.atmos_4xday.nc.0005
+end
+mv atmos_4xday.nc.0006 00060101.atmos_4xday.nc.0006
+end
+mv atmos_4xday.nc.0007 00060101.atmos_4xday.nc.0007
+end
+mv atmos_4xday.nc.0008 00060101.atmos_4xday.nc.0008
+end
+mv atmos_4xday.nc.0009 00060101.atmos_4xday.nc.0009
+end
+mv atmos_4xday.nc.0010 00060101.atmos_4xday.nc.0010
+end
+mv atmos_4xday.nc.0011 00060101.atmos_4xday.nc.0011
+end
+mv atmos_4xday.nc.0012 00060101.atmos_4xday.nc.0012
+end
+mv atmos_4xday.nc.0013 00060101.atmos_4xday.nc.0013
+end
+mv atmos_4xday.nc.0014 00060101.atmos_4xday.nc.0014
+end
+mv atmos_4xday.nc.0015 00060101.atmos_4xday.nc.0015
+end
+mv atmos_4xday.nc.0016 00060101.atmos_4xday.nc.0016
+end
+mv atmos_4xday.nc.0017 00060101.atmos_4xday.nc.0017
+end
+mv atmos_4xday.nc.0018 00060101.atmos_4xday.nc.0018
+end
+mv atmos_4xday.nc.0019 00060101.atmos_4xday.nc.0019
+end
+mv atmos_4xday.nc.0020 00060101.atmos_4xday.nc.0020
+end
+mv atmos_4xday.nc.0021 00060101.atmos_4xday.nc.0021
+end
+mv atmos_4xday.nc.0022 00060101.atmos_4xday.nc.0022
+end
+mv atmos_4xday.nc.0023 00060101.atmos_4xday.nc.0023
+end
+mv atmos_4xday.nc.0024 00060101.atmos_4xday.nc.0024
+end
+mv atmos_4xday.nc.0025 00060101.atmos_4xday.nc.0025
+end
+mv atmos_4xday.nc.0026 00060101.atmos_4xday.nc.0026
+end
+mv atmos_4xday.nc.0027 00060101.atmos_4xday.nc.0027
+end
+mv atmos_4xday.nc.0028 00060101.atmos_4xday.nc.0028
+end
+mv atmos_4xday.nc.0029 00060101.atmos_4xday.nc.0029
+end
+mv atmos_4xday.nc.0030 00060101.atmos_4xday.nc.0030
+end
+mv atmos_4xday.nc.0031 00060101.atmos_4xday.nc.0031
+end
+mv atmos_average.nc.0000 00060101.atmos_average.nc.0000
+end
+mv atmos_average.nc.0001 00060101.atmos_average.nc.0001
+end
+mv atmos_average.nc.0002 00060101.atmos_average.nc.0002
+end
+mv atmos_average.nc.0003 00060101.atmos_average.nc.0003
+end
+mv atmos_average.nc.0004 00060101.atmos_average.nc.0004
+end
+mv atmos_average.nc.0005 00060101.atmos_average.nc.0005
+end
+mv atmos_average.nc.0006 00060101.atmos_average.nc.0006
+end
+mv atmos_average.nc.0007 00060101.atmos_average.nc.0007
+end
+mv atmos_average.nc.0008 00060101.atmos_average.nc.0008
+end
+mv atmos_average.nc.0009 00060101.atmos_average.nc.0009
+end
+mv atmos_average.nc.0010 00060101.atmos_average.nc.0010
+end
+mv atmos_average.nc.0011 00060101.atmos_average.nc.0011
+end
+mv atmos_average.nc.0012 00060101.atmos_average.nc.0012
+end
+mv atmos_average.nc.0013 00060101.atmos_average.nc.0013
+end
+mv atmos_average.nc.0014 00060101.atmos_average.nc.0014
+end
+mv atmos_average.nc.0015 00060101.atmos_average.nc.0015
+end
+mv atmos_average.nc.0016 00060101.atmos_average.nc.0016
+end
+mv atmos_average.nc.0017 00060101.atmos_average.nc.0017
+end
+mv atmos_average.nc.0018 00060101.atmos_average.nc.0018
+end
+mv atmos_average.nc.0019 00060101.atmos_average.nc.0019
+end
+mv atmos_average.nc.0020 00060101.atmos_average.nc.0020
+end
+mv atmos_average.nc.0021 00060101.atmos_average.nc.0021
+end
+mv atmos_average.nc.0022 00060101.atmos_average.nc.0022
+end
+mv atmos_average.nc.0023 00060101.atmos_average.nc.0023
+end
+mv atmos_average.nc.0024 00060101.atmos_average.nc.0024
+end
+mv atmos_average.nc.0025 00060101.atmos_average.nc.0025
+end
+mv atmos_average.nc.0026 00060101.atmos_average.nc.0026
+end
+mv atmos_average.nc.0027 00060101.atmos_average.nc.0027
+end
+mv atmos_average.nc.0028 00060101.atmos_average.nc.0028
+end
+mv atmos_average.nc.0029 00060101.atmos_average.nc.0029
+end
+mv atmos_average.nc.0030 00060101.atmos_average.nc.0030
+end
+mv atmos_average.nc.0031 00060101.atmos_average.nc.0031
+end
+foreach donefile ( `ls *.$suffix` )
+ls: No match.
+foreach ncfile ( `ls *.$suffix.0000` )
+ls 00060101.atmos_4xday.nc.0000 00060101.atmos_average.nc.0000
+/glade/u/home/chen/idealized/exp/../bin/mppnccombine.ncar 00060101.atmos_4xday.nc
+/glade/u/home/chen/idealized/exp/../bin/mppnccombine.ncar: Command not found.
+if ( 1 != 0 ) then
+cp 00060101.atmos_4xday.nc.0000 00060101.atmos_4xday.nc.0001 00060101.atmos_4xday.nc.0002 00060101.atmos_4xday.nc.0003 00060101.atmos_4xday.nc.0004 00060101.atmos_4xday.nc.0005 00060101.atmos_4xday.nc.0006 00060101.atmos_4xday.nc.0007 00060101.atmos_4xday.nc.0008 00060101.atmos_4xday.nc.0009 00060101.atmos_4xday.nc.0010 00060101.atmos_4xday.nc.0011 00060101.atmos_4xday.nc.0012 00060101.atmos_4xday.nc.0013 00060101.atmos_4xday.nc.0014 00060101.atmos_4xday.nc.0015 00060101.atmos_4xday.nc.0016 00060101.atmos_4xday.nc.0017 00060101.atmos_4xday.nc.0018 00060101.atmos_4xday.nc.0019 00060101.atmos_4xday.nc.0020 00060101.atmos_4xday.nc.0021 00060101.atmos_4xday.nc.0022 00060101.atmos_4xday.nc.0023 00060101.atmos_4xday.nc.0024 00060101.atmos_4xday.nc.0025 00060101.atmos_4xday.nc.0026 00060101.atmos_4xday.nc.0027 00060101.atmos_4xday.nc.0028 00060101.atmos_4xday.nc.0029 00060101.atmos_4xday.nc.0030 00060101.atmos_4xday.nc.0031 00060101.atmos_average.nc.0000 00060101.atmos_average.nc.0001 00060101.atmos_average.nc.0002 00060101.atmos_average.nc.0003 00060101.atmos_average.nc.0004 00060101.atmos_average.nc.0005 00060101.atmos_average.nc.0006 00060101.atmos_average.nc.0007 00060101.atmos_average.nc.0008 00060101.atmos_average.nc.0009 00060101.atmos_average.nc.0010 00060101.atmos_average.nc.0011 00060101.atmos_average.nc.0012 00060101.atmos_average.nc.0013 00060101.atmos_average.nc.0014 00060101.atmos_average.nc.0015 00060101.atmos_average.nc.0016 00060101.atmos_average.nc.0017 00060101.atmos_average.nc.0018 00060101.atmos_average.nc.0019 00060101.atmos_average.nc.0020 00060101.atmos_average.nc.0021 00060101.atmos_average.nc.0022 00060101.atmos_average.nc.0023 00060101.atmos_average.nc.0024 00060101.atmos_average.nc.0025 00060101.atmos_average.nc.0026 00060101.atmos_average.nc.0027 00060101.atmos_average.nc.0028 00060101.atmos_average.nc.0029 00060101.atmos_average.nc.0030 00060101.atmos_average.nc.0031 /glade/u/home/chen/data/fullrad/default/run_ctl/history
+cp 00060101.atmos_4xday.nc /glade/u/home/chen/data/fullrad/default/run_ctl/history/00060101.atmos_4xday.nc
+cp: cannot stat ‘00060101.atmos_4xday.nc’: No such file or directory
+unset echo
+ERROR: in mppnccombine, run 1, loop 3
+ERROR: individual output files copied to /glade/u/home/chen/data/fullrad/default/run_ctl/history

@@ -1,0 +1,61 @@
+"FMS Model results from the idealized moist model with gray radiation"
+1 1 1 0 0 0
+#output files
+"atmos_4xday",    6, "hours", 1, "days", "time",
+"atmos_average",  -1, "hours", 1, "days", "time",
+#diagnostic field entries.
+ "dynamics",        "bk",                  "bk",                 "atmos_4xday",      "all", .false., "none", 2,
+ "dynamics",        "pk",                  "pk",                 "atmos_4xday",      "all", .false., "none", 2,
+ "dynamics",        "ps",                  "ps",                 "atmos_4xday",      "all", .false., "none", 2,
+ "dynamics",        "ucomp",               "ucomp",              "atmos_4xday",      "all", .false., "none", 2,
+ "dynamics",        "vcomp",               "vcomp",              "atmos_4xday",      "all", .false., "none", 2,
+ "dynamics",        "temp",                "temp",               "atmos_4xday",      "all", .false., "none", 2,
+ "dynamics",        "omega",               "omega",              "atmos_4xday",      "all", .false., "none", 2,
+ "dynamics",        "sphum",               "sphum",              "atmos_4xday",      "all", .false., "none", 2,
+ "atmosphere",      "dt_qg_condensation",  "dt_qg_condensation", "atmos_4xday",      "all", .false., "none", 2,
+ "atmosphere",      "dt_qg_convection",    "dt_qg_convection",   "atmos_4xday",      "all", .false., "none", 2,
+ "atmosphere",      "convection_rain",     "convection_rain",    "atmos_4xday",      "all", .false., "none", 2,
+ "atmosphere",      "condensation_rain",   "condensation_rain",  "atmos_4xday",      "all", .false., "none", 2,
+ "two_stream",      "tdt_rad",             "tdt_rad",            "atmos_average",    "all", .true.,  "none", 2,
+ "two_stream",      "flux_lw",             "flux_lw",            "atmos_average",    "all", .true.,  "none", 2,
+ "two_stream",      "flux_sw",             "flux_sw",            "atmos_average",    "all", .true.,  "none", 2,
+ "two_stream",      "swdn_toa",            "swdn_toa",           "atmos_average",    "all", .true.,  "none", 2,
+ "atmosphere",      "dt_tg_diffusion",     "dt_tg_diffusion",    "atmos_average",    "all", .true.,  "none", 2,
+ "atmosphere",      "dt_qg_diffusion",     "dt_qg_diffusion",    "atmos_average",    "all", .true.,  "none", 2,
+ "atmosphere",      "dt_tg_condensation",  "dt_tg_condensation", "atmos_average",    "all", .true.,  "none", 2,
+ "atmosphere",      "dt_tg_convection",    "dt_tg_convection",   "atmos_average",    "all", .true.,  "none", 2,
+ "mixed_layer",     "t_surf",              "t_surf",             "atmos_average",    "all", .true.,  "none", 2,
+ "mixed_layer",     "flux_t",              "flux_t",             "atmos_average",    "all", .true.,  "none", 2,
+ "mixed_layer",     "flux_lhe",            "flux_lhe",           "atmos_average",    "all", .true.,  "none", 2,
+ "mixed_layer",     "flux_oceanq",         "flux_oceanq",        "atmos_average",    "all", .true.,  "none", 2,
+
+#=============================================================================================
+#
+#  FORMATS FOR FILE ENTRIES (not all input values are used)
+#  ------------------------
+#
+#"file_name", output_freq, "output_units", format, "time_units", "long_name"
+#
+#
+#   output_freq:  > 0  output frequency in "output_units"
+#                 = 0  output frequency every time step
+#                 =-1  output frequency at end of run
+#
+#   output_units = units used for output frequency
+#                  (years, months, days, minutes, hours, seconds)
+#
+#   time_units   = units used to label the time axis
+#                  (days, minutes, hours, seconds)
+#
+#
+#  FORMAT FOR FIELD ENTRIES (not all input values are used)
+#  ------------------------
+#
+#"module_name", "field_name", "output_name", "file_name", "time_sampling", time_avg, "other_opts", packing
+#
+#   time_avg = .true. or .false.
+#
+#   packing  = 1  double precision
+#            = 2  float
+#            = 4  packed 16-bit integers
+#            = 8  packed 1-byte (not tested?)

@@ -1,0 +1,61 @@
+#!/bin/tcsh -f
+unalias *
+%(echo_opt)s
+
+#--------------------------------------------------------------------------------------------------------
+set compile_opt = "%(compile_opt)s"
+set name        = %(name)s
+set version     = %(version)s 
+
+#--------------------------------------------------------------------------------------------------------
+set platform  = %(platform)s                                     # A unique identifier for your platform
+if( $compile_opt == "") then
+  set template  = $cwd/../bin/mkmf.template.$platform                 # path to template for your platform
+else
+  set template  = $cwd/../bin/mkmf.template.$platform.$compile_opt    # path to template for your platform
+endif
+set mkmf      = $cwd/../bin/mkmf                      # path to executable mkmf
+set sourcedir = $cwd/../../src                           # path to directory containing model source code
+set myList    = %(myList)s
+set pathnames = $cwd/path_names                          # path to file containing list of source paths
+set mppnccombine = $cwd/../../bin/mppnccombine.$platform # path to executable mppnccombine
+
+#--------------------------------------------------------------------------------------------------------
+if( $compile_opt == "") then
+  set execdir   = $cwd/exec.$platform.$version                           # where code is compiled and executable is created
+else
+  set execdir   = $cwd/exec.$platform.$version.$compile_opt              # where code is compiled and executable is created
+endif
+set executable = $execdir/fms.x
+
+%(compiler_info)s
+
+#--------------------------------------------------------------------------------------------------------
+# compile mppnccombine.c, will be used only if $npes > 1
+if ( ! -f $mppnccombine ) then
+  gcc -O -I $cwd/../../netcdf/include -o $mppnccombine $cwd/../../postprocessing/mppnccombine.c -L$cwd/../../netcdf/lib -lnetcdf
+endif
+
+#--------------------------------------------------------------------------------------------------------
+# setup directory structure, compile the model code, and create executable
+if ( ! -d $execdir ) mkdir $execdir
+cd $execdir
+set cppDefs = "-Duse_libMPI -Duse_netCDF -Duse_LARGEFILE -DINTERNAL_FILE_NML -DOVERLOAD_C8 %(moist_model_opt)s"
+$mkmf -p $executable:t -t $template -c "$cppDefs" -a $sourcedir $myList $pathnames $sourcedir/shared/mpp/include $sourcedir/shared/include
+
+if ( $status != 0 ) then
+   unset echo
+   echo "ERROR: mkmf failed for $name model" 
+   exit 1
+endif
+
+# --- execute make ---
+make $executable:t
+if ( $status != 0 ) then
+   unset echo
+   echo "ERROR: make failed for $name model" 
+   exit 1
+endif
+
+unset echo
+echo "NOTE: make successful for $name model"

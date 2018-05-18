@@ -1,0 +1,28 @@
+&fms_io_nml
+   threading_write = 'single',
+   fileset_write = 'single',
+   max_files_r=300,
+   max_files_w=300,/
+
+&fms_nml
+   domains_stack_size = 8847360,
+   stack_size = 0,/
+
+&Tpdf_nml
+   exp_name  ='temp_adv', 
+   num_time  =6000, 
+   theta_0   =300,         delta_theta=60,            tau=10, 
+   phi_0     =45,          delta_phi=10, 
+   wavenumber=6,           angular_speed=15, 
+   zeta_0    =1.e-9,       tau_s=2., 
+   velocity_const          = .false., 
+   total_gradient          = .true.,
+   num_lon                 = 256,
+   num_lat                 = 128,
+   num_fourier             = 85,
+   num_spherical           = 86,
+   fourier_inc             = 1,
+   damping_option          = 'resolution_independent',
+   damping_order           = 2,
+   damping_coeff           = 1.0e15,
+   dt_real                 = 1200 /

@@ -1,0 +1,843 @@
+<HTML>
+<TITLE>NetCDF Interface Routines</TITLE>
+<BODY BGCOLOR="#AABBCC" TEXT="#332211" >
+
+<H2>NetCDF Interface Routines</H2>
+
+<PRE>
+     Version: vers3.4
+     Date:    July 26, 1999
+     Contact: Bruce Wyman
+</PRE>
+
+<HR>
+
+<H3>Introduction</H3>
+
+The routines described in this document provide a user-friendly set of interfaces that read and 
+write Network Common Data Form (netCDF) self-describing files. The interfaces described 
+within are written in Fortran 90 utilizing features such as modules, user-derived data types, and 
+optional arguments.
+<BR><BR>
+
+<HR>
+
+<H3>Usage</H3>
+
+<PRE>
+use netcdf_driver_mod [, only: ncfile_type, ............. ]
+</PRE>
+
+<HR>
+<!--------------------------------------------------------------------->
+
+<H2>Derived Data Types</H2>
+
+<PRE>
+<B>type(ncfile_type)</B>
+    This derived type variable contains all the NetCDF file header information.
+    Although the contents of this variable type are public the user
+    is discouraged from accessing the data directly. Users should use
+    the routines described in this document to access the data in this
+    derived type. <B>All routines in this package require this variable as
+    an argument or returned value.</B>
+</PRE>
+
+<HR>
+<!--------------------------------------------------------------------->
+
+<H2>Summary of Reading Routines</H2>
+
+<B>READ HEADER INFORMATION</B>
+<DL>
+<DT><A HREF="#read_file_header">read_file_header</A>
+<DD>Reads all file header information.
+</DL>
+
+<B>AXIS INFORMATION</B>
+<DL>
+<DT><A HREF="#num_axis">num_axis</A>
+<DD>Returns the number of axes (including time) in a NetCDF file.
+
+<DT><A HREF="#axis_name">axis_name</A>
+<DD>Given the axis index, the axis name is returned.
+
+<DT><A HREF="#axis_index">axis_index</A>
+<DD>Given the axis name, the axis index is returned.
+
+<DT><A HREF="#axis_length">axis_length</A>
+<DD>Given the axis index or name, the axis length is returned.
+
+<DT><A HREF="#axis_values">axis_values</A>
+<DD>Given the axis index or name, the axis values (data) are returned.
+
+<DT><A HREF="#get_axis_units">get_axis_units</A>
+<DD>Given the axis index or name, the axis units attribute is returned.
+
+<DT><A HREF="#get_axis_long_name">get_axis_long_name</A>
+<DD>Given the axis index or name, the axis long name attribute is returned.
+
+<DT><A HREF="#get_axis_edges_name">get_axis_edges_name</A>
+<DD>Given the axis index or name, the axis edges name attribute is returned.
+
+<DT><A HREF="#get_axis_cart_name">get_axis_cart_name</A>
+<DD>Given the axis index or name, the axis cartesian identifier is returned.
+
+<DT><A HREF="#get_axis_direction">get_axis_direction</A>
+<DD>Given the axis index or name, the axis direction (up/down) is returned.
+</DL>
+
+<B>TIME AXIS INFORMATION</B>
+<DL>
+<DT><A HREF="#time_axis_index">time_axis_index</A>
+<DD>Returns the index of the time axis.
+
+<DT><A HREF="#time_axis_length">time_axis_length</A>
+<DD>Returns the length of the time axis.
+
+<DT><A HREF="#time_axis_values">time_axis_values</A>
+<DD>Returns the time axis values (data).
+
+<DT><A HREF="#get_calendar_type">get_calendar_type</A>
+<DD>Given the axis index or name, the axis calendar attribute is returned.
+</DL>
+
+<B>VARIABLE INFORMATION</B>
+<DL>
+<DT><A HREF="#num_var">num_var</A>
+<DD>Returns the number of variables in a NetCDF file.
+
+<DT><A HREF="#var_name">var_name</A>
+<DD>Given the variable index, the variable name is returned.
+
+<DT><A HREF="#var_index">var_index</A>
+<DD>Given the variable name, the variable index is returned.
+
+<DT><A HREF="#num_var_axis">num_var_axis</A>
+<DD>Given the variable index or name, the number of axes (including time) is returned.
+
+<DT><A HREF="#var_axis">var_axis</A>
+<DD>Given the variable index or name, the axis indices are returned.
+
+<DT><A HREF="#var_axis_len">var_axis_len</A>
+<DD>Given the variable index or name, the axis lengths are returned (i.e., variable dimensions).
+
+<DT><A HREF="#get_var_units">get_var_units</A>
+<DD>Given the variable index or name, the units attribute is returned.
+
+<DT><A HREF="#get_var_long_name">get_var_long_name</A>
+<DD>Given the variable index or name, the long name attribute is returned.
+
+<DT><A HREF="#get_missing_value">get_missing_value</A>
+<DD>Given the variable index or name, the missing value is returned.
+
+<DT><A HREF="#get_valid_range">get_valid_range</A>
+<DD>Given the variable index or name, the valid range is returned.
+</DL>
+
+<B>READING NON-HEADER INFORMATION</B>
+<DL>
+<DT><A HREF="#read_time_coord">read_time_coord</A>
+<DD>Reads time axis data.
+
+<DT><A HREF="#read_variable">read_variable</A>
+<DD>Reads variable data.
+
+<DT><A HREF="#read_variable_tave">read_variable_tave</A>
+<DD>Reads the time average information for a given variable.
+</DL>
+
+<HR>
+<!--------------------------------------------------------------------->
+
+<H2>Summary of Writing Routines</H2>
+
+<B>DEFINITION ROUTINES</B>
+<DL>
+<DT><A HREF="#define_file">define_file</A>
+<DD>Set up a new NetCDF file (containing no axes or variables).
+
+<DT><A HREF="#define_axis">define_axis</A>
+<DD>Define a new axis (adding it to a NetCDF file).
+
+<DT><A HREF="#define_time_axis">define_time_axis</A>
+<DD>Define the time axis (adding it to a NetCDF file).
+
+<DT><A HREF="#define_variable">define_variable</A>
+<DD>Define a new variable (adding it to a NetCDF file).
+    
+<DT><A HREF="#define_variable_tave">define_variable_tave</A>
+<DD>Define a variable's time averaging information.
+
+<DT><A HREF="#define_tave">define_tave</A>
+<DD>Define a variable for storing time average information.
+</DL>
+
+<B>COPY/WRITE/CLOSE HEADER INFORMATION</B>
+<DL>
+<DT><A HREF="#copy_file_header">copy_file_header</A>
+<DD>Copy file header information between variables of type(ncfile_type).
+
+<DT><A HREF="#write_file_header">write_file_header</A>
+<DD>Write the file header information to disk.
+
+<DT><A HREF="#close_file">close_file</A>
+<DD>Close the NetCDF file after writing.
+
+<DT><A HREF="#empty_file">empty_file</A>
+<DD>Empty (and deallocate) storage in a file header variable of type(ncfile_type).
+</DL>
+
+<B>WRITING NON-HEADER INFORMATION</B>
+<DL>
+<DT><A HREF="#write_time_coord">write_time_coord</A>
+<DD>Writes time axis data.
+
+<DT><A HREF="#write_variable">write_variable</A>
+<DD>Writes variable data.
+
+<DT><A HREF="#write_variable_tave">write_variable_tave</A>
+<DD>Writes the time average information for a given variable.
+</DL>
+
+<HR>
+<!--------------------------------------------------------------------->
+
+<H2>DETAILED ROUTINE DESCRIPTIONS</H2>
+
+<!--------------------------------------------------------------------->
+<A NAME="read_file_header">
+<HR>
+<P><B>read_file_header</B> -- Reads all file header information.
+
+<PRE>
+File = read_file_header (file_name)
+     character(len=*), intent(in) :: file_name
+     type(ncfile_type)            :: File
+</PRE>
+
+<P>This function reads all the file header information for the
+   input name (or path) of an existing NetCDF file.  The maximum
+   length of <i>file_name</i> is 128 characters.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<A NAME="num_axis">
+<HR>
+<P><B>num_axis</B> -- Returns the number of axes (including time) in a NetCDF file.
+
+<PRE>
+num = num_axis (File)
+    type(ncfile_type), intent(in) :: File
+    integer                       :: num
+</PRE>
+
+<P>Given the derived type variable of type(ncfile_type), returned by
+   a previous call to read_file_header, this integer function returns
+   the number of axes (including time) in the NetCDF file.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<A NAME="axis_name">
+<HR>
+<P><B>axis_name</B> -- Given the axis index, the axis name is returned.
+
+<PRE>
+name = axis_name (File, axis_index)
+    type(ncfile_type), intent(in) :: File
+    integer          , intent(in) :: axis_index
+    character                        name
+</PRE>
+
+<P> This routine is called with a integer axis id (axis_index),
+    where the value of axis_index ranges from 1 to <i>num_axis</i> (see above).
+    A fatal error will occur if axis_index is not in this range.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<A NAME="axis_index">
+<HR>
+<P><B>axis_index</B> -- Given the axis name, the axis index is returned.
+
+<PRE>
+index = axis_index (File, axis_name)
+    type(ncfile_type), intent(in) :: File
+    integer          , intent(in) :: axis_name
+    character                        index
+</PRE>
+
+<P> This routine is called with the name of an axis (axis_name),
+    the returned value ranges from 0 to <i>num_axis</i> (see above).
+    A value of zero means the axis was not found. Users should check on
+    this value as an error condiion.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<A NAME="axis_length">
+<HR>
+<P><B>axis_length</B> -- Given the axis index or name, the axis length is returned.
+
+<PRE>
+length = axis_length (File, axis_index)
+length = axis_length (File, axis_name)
+      type(ncfile_type), intent(in) :: File
+      integer          , intent(in) :: axis_index
+      character(len=*) , intent(in) :: axis_name
+      integer                       :: length
+</PRE>
+
+<P> This may be called with either an integer id or the character name
+    of the axis. The return integer value is the number of coordinate values
+    in the axis.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<A NAME="axis_values">
+<HR>
+<P><B>axis_values</B> -- Given the axis index or name, the axis values (data) are returned.
+
+<PRE>
+call axis_values ( File, axis_index, data [,start] )
+call axis_values ( File, axis_name,  data [,start] )
+      type(ncfile_type), intent(in)  :: File
+      integer          , intent(in)  :: axis_index
+      character(len=*) , intent(in)  :: axis_name
+      real             , intent(out) :: data(:)
+      integer, optional, intent(in)  :: start
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="time_axis_index">
+<HR>
+<P><B>time_axis_index</B> -- Returns the index of the time axis.
+
+<PRE>
+index = time_axis_index (File)
+    type(ncfile_type), intent(in) :: File
+    integer                       :: index
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="time_axis_length">
+<HR>
+<P><B>time_axis_length</B> -- Returns the length of the time axis.
+
+<PRE>
+len = time_axis_length (File)
+    type(ncfile_type), intent(in) :: File
+    integer                       :: len
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="time_axis_values">
+<HR>
+<P><B>time_axis_values</B> -- Returns the time axis values (data).
+
+<PRE>
+call time_axis_values ( File, data [,start] )
+    type(ncfile_type), intent(in)  :: File
+    real             , intent(out) :: data(:)
+    integer, optional, intent(in)  :: start
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="num_var">
+<HR>
+<P><B>num_var</B> -- Returns the number of variables in a NetCDF file.
+
+<PRE>
+num = num_var (File)
+    type(ncfile_type), intent(in) :: File
+    integer                       :: num
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="var_name">
+<HR>
+<P><B>var_name</B> -- Given a variable index, the variable name is returned.
+
+<PRE>
+name = var_name (File, var_index)
+    type(ncfile_type), intent(in) :: File
+    integer          , intent(in) :: var_index
+    character                        name
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="var_index">
+<HR>
+<P><B>var_index</B> -- Given the variable name, the variable index is returned.
+
+<PRE>
+index = var_index (File, var_name)
+    type(ncfile_type), intent(in) :: File
+    character(len=*) , intent(in) :: var_name
+    integer                          index
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="num_var_axis">
+<HR>
+<P><B>num_var_axis</B> -- Given the variable index or name, the number of axes (including time) is returned. 
+
+<PRE>
+num = num_var_axis (File, var_index)
+num = num_var_axis (File, var_name)
+      type(ncfile_type), intent(in) :: File
+      integer          , intent(in) :: var_index
+      character(len=*) , intent(in) :: var_name
+      integer                       :: num
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="var_axis">
+<HR>
+<P><B>var_axis</B> -- Given the variable index or name, the axis indices are returned. 
+
+<PRE>
+call var_axis (File, var_index, axes)
+call var_axis (File, var_name,  axes)
+      type(ncfile_type), intent(in)  :: File
+      integer          , intent(in)  :: var_index
+      character(len=*) , intent(in)  :: var_name
+      integer          , intent(out) :: axes(:)
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="var_axis_len">
+<HR>
+<P><B>var_axis_len</B> -- Given the variable index or name, the axis lengths are returned (i.e., variable dimensions). 
+
+<PRE>
+call var_axis_len (File, var_index, len)
+call var_axis_len (File, var_name,  len)
+      type(ncfile_type), intent(in)  :: File
+      integer          , intent(in)  :: var_index
+      character(len=*) , intent(in)  :: var_name
+      integer          , intent(out) :: len(:)
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="read_time_coord">
+<HR>
+<P><B>read_time_coord</B> -- Reads time axis data.
+
+<PRE>
+call read_time_coord (File, start, data)
+      type(ncfile_type), intent(in)  :: File
+      integer          , intent(in)  :: start
+      real(float_type) , intent(out) :: data or data(:)
+      real(double_type), intent(out) :: data or data(:)
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="read_variable">
+<HR>
+<P><B>read_variable</B> -- Reads variable data.
+
+<PRE>
+call read_variable (File, var_name, start, count, data)
+call read_variable (File, var_name, start, data)
+      type(ncfile_type), intent(in)  :: File
+      character(len=*),  intent(in)  :: var_name
+      integer         ,  intent(in)  :: start(:), count(:)
+      real            ,  intent(out) :: data(:) or data(:,:) or
+                                        data(:,:,:) or data(:,:,:,:)
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="read_variable_tave">
+<HR>
+<P><B>read_variable_tave</B> -- Reads the time average information for a given variable.
+
+<PRE>
+flag = read_variable_tave (File, var_name, start, t1, t2, dt [,nitems] )
+      type(ncfile_type), intent(in)  :: File
+      character(len=*),  intent(in)  :: var_name
+      integer         ,  intent(in)  :: start
+      real            ,  intent(out) :: t1, t2, dt   or   t1(:), t2(:), dt(:)
+      integer, optional, intent(out) :: nitems  or  nitems(:)
+      logical                        :: flag
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="get_axis_units">
+<HR>
+<P><B>get_axis_units</B> -- Given the axis index or name, the axis units attribute is returned.
+
+<PRE>
+flag = get_axis_units (File, axis_index, units)
+flag = get_axis_units (File, axis_name,  units)
+      type(ncfile_type), intent(in)  :: File
+      integer         ,  intent(in)  :: axis_index
+      character(len=*),  intent(in)  :: axis_name
+      character(len=*),  intent(out) :: units
+      logical                        :: flag
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="get_axis_long_name">
+<HR>
+<P><B>get_axis_long_name</B> -- Given the axis index or name, the axis long name attribute is returned.
+
+<PRE>
+flag = get_axis_long_name (File, axis_index, long_name)
+flag = get_axis_long_name (File, axis_name,  long_name)
+      type(ncfile_type), intent(in)  :: File
+      integer         ,  intent(in)  :: axis_index
+      character(len=*),  intent(in)  :: axis_name
+      character(len=*),  intent(out) :: long_name
+      logical                        :: flag
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="get_axis_cart_name">
+<HR>
+<P><B>get_axis_cart_name</B> -- Given the axis index or name, the axis cartesian identifier is returned.
+
+<PRE>
+flag = get_axis_cart_name (File, axis_index, cart_name)
+flag = get_axis_cart_name (File, axis_name,  cart_name)
+      type(ncfile_type), intent(in)  :: File
+      integer         ,  intent(in)  :: axis_index
+      character(len=*),  intent(in)  :: axis_name
+      character(len=1),  intent(out) :: cart_name
+      logical                        :: flag
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="get_axis_direction">
+<HR>
+<P><B>get_axis_direction</B> -- Given the axis index or name, the axis direction (up/down) is returned.
+
+<PRE>
+flag = get_axis_direction (File, axis_index, direction)
+flag = get_axis_direction (File, axis_name,  direction)
+      type(ncfile_type), intent(in)  :: File
+      integer         ,  intent(in)  :: axis_index
+      character(len=*),  intent(in)  :: axis_name
+      character(len=*),  intent(out) :: direction
+      logical                        :: flag
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="get_calendar_type">
+<HR>
+<P><B>get_calendar_type</B> -- Given the axis index or name, the axis calendar attribute is returned.
+
+<PRE>
+flag = get_calendar_type (File, calendar)
+flag = get_calendar_type (File, axis_index, calendar)
+flag = get_calendar_type (File, axis_name,  calendar)
+      type(ncfile_type), intent(in)  :: File
+      integer         ,  intent(in)  :: axis_index
+      character(len=*),  intent(in)  :: axis_name
+      character(len=*),  intent(out) :: calendar
+      logical                        :: flag
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="get_var_units">
+<HR>
+<P><B>get_var_units</B> -- Given the variable index or name, the units attribute is returned.
+
+<PRE>
+flag = get_var_units (File, var_index, units)
+flag = get_var_units (File, var_name,  units)
+      type(ncfile_type), intent(in)  :: File
+      integer         ,  intent(in)  :: var_index
+      character(len=*),  intent(in)  :: var_name
+      character(len=*),  intent(out) :: units
+      logical                        :: flag
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="get_var_long_name">
+<HR>
+<P><B>get_var_long_name</B> -- Given the variable index or name, the long name attribute is returned.
+
+<PRE>
+flag = get_var_long_name (File, var_index, long_name)
+flag = get_var_long_name (File, var_name,  long_name)
+      type(ncfile_type), intent(in)  :: File
+      integer         ,  intent(in)  :: var_index
+      character(len=*),  intent(in)  :: var_name
+      character(len=*),  intent(out) :: long_name
+      logical                        :: flag
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="get_missing_value">
+<HR>
+<P><B>get_missing_value</B> -- Given the variable index or name, the missing value is returned.
+
+<PRE>
+flag = get_missing_value (File, var_index, value)
+flag = get_missing_value (File, var_name,  value)
+      type(ncfile_type), intent(in)  :: File
+      integer         ,  intent(in)  :: var_index
+      character(len=*),  intent(in)  :: var_name
+      real            ,  intent(out) :: value
+      logical                        :: flag
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="get_valid_range">
+<HR>
+<P><B>get_valid_range</B> -- Given the variable index or name, the valid range is returned.
+
+<PRE>
+flag = get_valid_range (File, var_index, vrange)
+flag = get_valid_range (File, var_name,  vrange)
+      type(ncfile_type), intent(in)  :: File
+      integer         ,  intent(in)  :: var_index
+      character(len=*),  intent(in)  :: var_name
+      real            ,  intent(out) :: vrange(2)
+      logical                        :: flag
+</PRE>
+
+<!--------------------------------------------------------------------->
+<HR>
+
+<H3>Writing Routines</H3>
+
+These routines define file header information storing it in the in/out argument of type ncfile_type. 
+No data is actually written to disk and no file is opened. All definition routines should be called 
+before writing file header information to disk via the write_file_header routine.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<A NAME="define_file">
+<HR>
+<P><B>define_file</B> -- Set up a new NetCDF file (containing no axes or variables).
+
+<PRE>
+call define_file (File, file_name, title, history, coards)
+	type(ncfile_type),  intent(inout)        :: File
+	character(len=*), intent(in)           :: file_name
+	character(len=*), intent(in), optional :: title, history
+	logical,          intent(in), optional :: coards
+</PRE>
+
+<P>Define a new ncfile_type file. A filename and optional global attributes are saved to the 
+   new ncfile_type. The optional variable coards adds a global attribute called Conventions, it 
+   does not enforce the COARDS conventions throughout the file, that is up to the user.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<A NAME="define_axis">
+<HR>
+<P><B>define_axis</B> -- Define a new axis (adding it to a NetCDF file).
+
+<PRE>
+call define_axis (File, axis_name, values, units, cart_axis, long_name, direction)
+	type(ncfile_type), intent(inout) :: File
+	character(len=*), intent(in)   :: axis_name
+	real            , intent(in), dimension(:) :: values
+	character(len=*), intent(in), optional     :: units, cart_axis, long_name, direction
+</PRE>
+
+<P>Define an axis/dimension that is not the record/time dimension. The array values must 
+   have the length of axis. Optional arguments add axis attributes that adhere to the 
+   COARDS convention. units are the axis units and does not necessarily have to follow the 
+   Unidata udunits conventions. cart_axis should be character string of length 1 with the 
+   possible values of `x', `y', or `z'. long_name is a descriptive name for the axis, and 
+   direction adds an axis attribute named positive and must have a value of `up' or `down' 
+   which is used by plotting programs to determine the direction of the vertical axis.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<A NAME="define_time_axis">
+<HR>
+<P><B>define_time_axis</B> -- Define the time axis (adding it to a NetCDF file).
+
+<PRE>
+call define_time_axis (File, axis_name, units, long_name, calendar)
+	type(ncfile_type), intent(inout) :: File
+	character(len=*), intent(in)   :: axis_name
+	character(len=*), intent(in), optional     :: units, long_name, calendar
+</PRE>
+
+<P>Define the record/time dimension. calendar adds an axis attribute for the type of calendar, 
+   there are currently no restrictions on what the value may or may not be. Typical values 
+   might be `julian', `no_leap', or `thirty_day_months', corresponding to the time manager.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<A NAME="define_variable">
+<HR>
+<P><B>define_variable</B> -- Define a new variable (adding it to a NetCDF file).
+
+<PRE>
+call define_variable (File, var_name, axes, units, long_name, miss_data, valid_range, pack)
+	type(ncfile_type), intent(inout)        :: File
+	character(len=*),  intent(in)           :: var_name, axes(:)
+	character(len=*),  intent(in), optional :: units, long_name
+	real,              intent(in), optional :: valid_range(2), miss_data
+	logical,           intent(in), optional :: pack
+</PRE>
+
+<P>Given the file header information (File), variable name (var_name), and variable header 
+   information, the variable is added  to the file header. The axis names are given in given in 
+   axes, which must have a maximum length of 4. By default 32-bit floating point data will 
+   be written, low precision data can be written as 16-bit (short) integers by setting pack = 
+   TRUE. Higher precision data can also be packed specifying a valid_range and pack = 
+   TRUE. The missing data value must be in the valid_range of the data for packing.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<A NAME="define_variable_tave">
+<HR>
+<P><B>define_variable_tave</B> -- Define a variable's time averaging information.
+
+<PRE>
+call define_variable_tave (File, var_name, avg_name)
+	type(ncfile_type), intent(inout)        :: File
+	character(len=*),  intent(in)           :: var_name
+	character(len=*),  intent(in), optional :: avg_name
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="define_tave">
+<HR>
+<P><B>define_tave</B> -- Define a variable for storing time average information.
+
+<PRE>
+call define_tave (File, avg_name)
+	type(ncfile_type),  intent(inout) :: File
+	character(len=*), intent(in)    :: avg_name
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="copy_file_header">
+<HR>
+<P><B>copy_file_header</B> -- Copy file header information between variables of type(ncfile_type).
+
+<PRE>
+File_out = copy_file_header (File_in)
+	type(ncfile_type) , intent(in) :: File_in
+	type(ncfile_type)              :: File_out
+</PRE>
+
+<P><B>WARNING</B>: do not use this interface, it is under development.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<A NAME="write_file_header">
+<HR>
+<P><B>write_file_header</B> -- Write the file header information to disk.
+
+<PRE>
+call write_file_header (File)
+	type(ncfile_type), intent(inout) :: File
+</PRE>
+
+<P>The given file header information (File) is written to a netCDF file. Note that the only data 
+   written is non-record/time dimension values. Non-dimension data that does not have a 
+   time-dimension is not written.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<A NAME="write_time_coord">
+<HR>
+<P><B>write_time_coord</B> -- Writes time axis data.
+
+<PRE>
+call write_time_coord (File, start, data)
+	type(ncfile_type), intent(in) :: File
+	integer,           intent(in) :: start
+	real(float_type) , intent(in) :: data or data(:)
+	real(double_type), intent(in) :: data or data(:)
+</PRE>
+
+<P>Given the file header information (File), the starting record/time dimension index (start) 
+   and length (count) that dimension, time data is written as 64-bit floating pointing values to 
+   a netCDF file. Start is a scalar, whereas (time) data may scalar or have a rank of 
+   1 and the total length of data must equal that given by count. Data may be of type double 
+   precision on a 32-bit machine.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<A NAME="write_variable">
+<HR>
+<P><B>write_variable</B> -- Writes variable data.
+
+<PRE>
+call write_variable ( File, var_name, start, count, data )
+call write_variable ( File, var_name, start, data )
+	type(ncfile_type), intent(in) :: File
+	character(len=*),  intent(in) :: var_name
+	integer,           intent(in) :: start(:), count(:)
+	real,              intent(in) :: data(:) or data(:,:) or
+                                     data(:,:,:) or data(:,:,:,:)
+</PRE>
+
+<P>Given the file header information (File), variable name (var_name), the starting index 
+   (start) and length (count) along each dimension, data is written to a netCDF file. Start and 
+   count are arrays of rank 1 and must have a length equal to the number of dimensions 
+   specified by the argument axes in define_variable. Data may have a rank equal to the 
+   number of dimensions or a rank of 1, the total length of data must equal that given by 
+   count.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<A NAME="write_variable_tave">
+<HR>
+<P><B>write_variable_tave</B> -- Writes the time average information for a given variable.
+
+<PRE>
+call write_variable_tave (File, var_name, start, t1, t2, dt)
+	type(ncfile_type) ,intent(inout) :: File
+	character(len=*),  intent(in)    :: var_name
+	integer         ,  intent(in)    :: start
+	real(double_type), intent(in)    :: t1(:), t2(:), dt(:)
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="close_file">
+<HR>
+<P><B>close_file</B> -- Close the NetCDF file after writing (or reading??).
+
+<PRE>
+call close_file (File)
+	type(ncfile_type), intent(inout) :: File
+</PRE>
+
+<!--------------------------------------------------------------------->
+<A NAME="empty_file">
+<HR>
+<P><B>empty_file</B> -- Empty (and deallocate) storage in a file header variable of type(ncfile_type).
+
+<PRE>
+call empty_file (File)
+	type(ncfile_type), intent(inout) :: File
+</PRE>
+
+<P><B>WARNING</B>: This interface is under development.
+<BR><BR>
+
+<!--------------------------------------------------------------------->
+<HR>
+
+<H2>Known Bugs</H2>
+
+<PRE>
+AXIS/VARIABLE ORDER PROBLEM
+
+   The axes must appear in the NetCDF file before any variables.
+   Some programs may not produce this ordering. To get around this
+   problem create a new file by using the NetCDF utility "ncks" to
+   first extract only the axes and then again to extract the variables.
+
+   For example:
+
+     ~jps/pub/netcdf/util/bin/ncks -h -A -c  bad_order.nc  new.nc
+     ~jps/pub/netcdf/util/bin/ncks -h -A     bad_order.nc  new.nc
+
+</PRE>
+
+<!--------------------------------------------------------------------->
+<HR>
+
+</BODY>
+</HTML>
