@@ -14,7 +14,7 @@
  "dynamics",        "height",              "height",             "atmos_4xday",      "all", .false., "none", 2,
  "dynamics",        "bk",                  "bk",                 "atmos_average",    "all", .false., "none", 2,
  "dynamics",        "pk",                  "pk",                 "atmos_average",    "all", .false., "none", 2,
- "dynamics",        "zsurf",               "zsurf",              "atmos_average",    "all", .true.,  "none", 2,
+ "dynamics",        "zsurf",               "zsurf",              "atmos_average",    "all", .false., "none", 2,
  "dynamics",        "ps",                  "ps",                 "atmos_average",    "all", .true.,  "none", 2,
  "dynamics",        "ucomp",               "ucomp",              "atmos_average",    "all", .true.,  "none", 2,
  "dynamics",        "vcomp",               "vcomp",              "atmos_average",    "all", .true.,  "none", 2,

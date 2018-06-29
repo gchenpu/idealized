@@ -1,0 +1,9 @@
+#!/bin/csh
+
+set codeDir = %(plevel_dir)s
+
+set options = "-fno-alias -fltconsistency -ftz -g -O2 -i4 -r8 -nowarn -Wp,-w -fpe0"
+
+ifort $options -I/usr/local/include -I%(cwd)s/netcdf/include $codeDir/plev_constants.F90 $codeDir/moisture_convert.F90 \
+         $codeDir/pressure_interp.F90 $codeDir/pinterp_utilities.F90 $codeDir/run_pressure_interp.F90 \
+                       -o PLEV.exe -L%(cwd)s/netcdf/lib -lnetcdf

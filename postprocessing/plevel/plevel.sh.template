@@ -83,8 +83,7 @@ fi
 
 # location of executable
 
-#executable=/net/bw/sources/FMS/plevel.v4/PLEV.v00.exe
-executable=/glade/u/home/chen/idealized/postprocessing/plevel/PLEV.exe
+executable=%(plevel_dir)s/PLEV.exe
 if [ ! -x "$executable" ]; then
    echo "ERROR: executable does not exist"
    echo "       executable=$executable"

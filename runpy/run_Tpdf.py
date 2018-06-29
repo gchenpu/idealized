@@ -1,9 +1,9 @@
 #===================================================================================
 # main program to compile and run an experiment of one fms model
 #
-# need to specify user-defined output root_dir (default=../data) and input root_dir (default=../work) in fmspy/mo.py
-# compile and run scripts are created in workdir (default=./workdir), which are temporary
-# suggest to create symbolic links to these directories without modifying the python code
+# need to specify user-defined INPUT_DIR (default=../work) and OUTPUT_DIR (default=../data) in fmspy/mo.py
+# permanent compile and run scripts are available in MY_DIR (default=exp)
+# temporatory compile and run scripts are saved in WORK_DIR (default=workdir)
 #===================================================================================
 import fmspy.mo
 

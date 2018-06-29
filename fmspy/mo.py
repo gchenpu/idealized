@@ -1,8 +1,5 @@
 #===================================================================================
 # mo.py: module to handle mkmf, compile, and run scripts in the fmspy package
-# default user-defined dir of files:  "./exp"
-# default user-defined output root_dir: "../data"
-# default user-defined input root_dir: "../work"
 #===================================================================================
 import os
 import sys
@@ -10,6 +7,11 @@ import shutil
 import subprocess
 import tarfile
 import fmspy.io
+
+INPUT_DIR    = "../work"                                           ### user-defined input dir
+OUTPUT_DIR   = "../data"                                           ### user-defined output dir
+MY_DIR       = "exp"                                               ### user-defined permanent dir of files
+WORK_DIR     = "workdir"                                           ### user-defined temporary work dir
 
 class FmsModel:
 
@@ -23,7 +25,7 @@ class FmsModel:
         # example of namelist_patch when exp_name_src is not []
         # namelist_patch = {'idealized_moist_phys_nml': {'radiation_scheme': 'two_stream'}, 'astronomy_nml': {'obliq': 23.5}}
 
-        if not name in ["fullrad", "gray", "hs", "hs_with_clouds", "f90", "martineau18"]:
+        if not name in ["fullrad", "gray", "hs", "hs_with_clouds", "f90", "strat_trop"]:
             raise Exception("\"%s\" is not a model name!" % name)
 
         self.name            = name                                                 # model name
@@ -51,11 +53,11 @@ class FmsModel:
         self.init_cond       = init_cond
         self.model2plevel    = model2plevel                                         # interpolate the model data to pressure levels if set as True
 
-        self.mydir           = "exp"                                                ### user-defined dir of files
-        self.workdir         = "workdir"                                            ### user-defined work dir
+        self.mydir           = MY_DIR                                                
+        self.workdir         = WORK_DIR
         self.cwd             = os.getcwd()
-        self.output_root     = os.path.abspath(os.path.join(self.cwd, "../data"))   ### user-defined output root_dir
-        self.input_root      = os.path.abspath(os.path.join(self.cwd, "../work"))   ### user-defined input root_dir
+        self.output_root     = os.path.abspath(os.path.join(self.cwd, OUTPUT_DIR))
+        self.input_root      = os.path.abspath(os.path.join(self.cwd, INPUT_DIR ))
 
         if (self.exp_name_src != []) and (self.exp_name_src != self.exp_name):
             src              = os.path.join(".", self.mydir, self.name, self.version, self.exp_name_src)
@@ -76,7 +78,7 @@ class FmsModel:
             self.compile_filename = os.path.join(".", self.workdir, self.name, "compile."+self.version+"."+self.compile_opt)
             self.run_filename     = os.path.join(".", self.workdir, self.name, self.version+"."+self.compile_opt, self.exp_name, "run")
 
-        self.plevel_filename      = os.path.abspath("./postprocessing/plevel.sh")
+        self.plevel_filename      = os.path.abspath(os.path.join(".", self.workdir, "postprocessing/plevel.sh"))
 
         # platform dependent configurations
         if self.platform == "ncar":
@@ -336,15 +338,26 @@ end
     # setup the plevel directory
     #===================================================================================
     def setup_plevel(self):
-        # create local compile and plevel scripts
-        print("\nSETTING UP \"plevel.sh\"")
-        output_format = {'cwd':self.cwd}
-        fmspy.io.write_script(os.path.join(".", "postprocessing/plevel/compile"), os.path.join(".", "postprocessing/plevel/templates/compile.template"), output_format, option='overwrite')
-        fmspy.io.write_script(os.path.join(".", "postprocessing/plevel.sh"),    os.path.join(".", "postprocessing/plevel/templates/plevel.sh.template"), output_format, option='overwrite')
+        # create the plevel directory
+        plevel_dir = os.path.dirname(self.plevel_filename)
+        print("\nSETTING UP \"%s\"" % plevel_dir)
+        if (not os.path.exists(plevel_dir)):
+            os.makedirs(plevel_dir)
 
-        os.chdir(os.path.join(self.cwd, "postprocessing/plevel"))
-        os.system('./compile')
-        os.chdir(self.cwd)
+        # copy plevel files
+        src      = os.path.join(".", "postprocessing/plevel")
+        dst      = plevel_dir
+        fmspy.io.copyfolder(src, dst, files_to_exclude=["compile.template", "plevel.sh.template"], option='silent')
+
+        # create compile file and plevel file
+        output_format = {'cwd':self.cwd, "plevel_dir":plevel_dir}
+        fmspy.io.write_script(os.path.join(plevel_dir, "compile"), "./postprocessing/plevel/compile.template",   output_format)
+        fmspy.io.write_script(self.plevel_filename,                "./postprocessing/plevel/plevel.sh.template", output_format)
+
+        if (not os.path.exists(os.path.join(plevel_dir, "PLEV.exe"))):
+            os.chdir(plevel_dir)
+            os.system('./compile')
+            os.chdir(self.cwd)
 
     #===================================================================================
     # setup and execute the compile script

@@ -10,4 +10,4 @@ Makefile*
 /src/my/
 /tests/
 /workdir/
-/exp/martineau18/default/run_ctl_*
+/exp/strat_trop/default/run_ctl_*

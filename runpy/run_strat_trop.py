@@ -16,24 +16,24 @@ import fmspy.mo
 # example of namelist_patch:
 # namelist_patch = {'idealized_moist_phys_nml': {'radiation_scheme': 'two_stream'}, 'astronomy_nml': {'obliq': 23.5}}
 
-#model = fmspy.mo.FmsModel(name="fullrad", dayslist='( 365 365 365 )', dt_atmos=600, \
-#                          queue_cmd="qsub", walltime="06:00:00", nnodes=1, ncores=16, nthreads=2)
-
-#model = fmspy.mo.FmsModel(name="gray",  dayslist='( 365 365 365 365 )', dt_atmos=600, \
-#                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=2)
-
-#model = fmspy.mo.FmsModel(name='hs',    dayslist='( 365 365 365 365 )', dt_atmos=1800, \
-#                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=2)
-
+# control experiment
 model = fmspy.mo.FmsModel(name='strat_trop', dayslist='( 365 365 365 365 )', dt_atmos=400, 
                           queue_cmd="qsub", nnodes=1, ncores=16, nthreads=2, model2plevel=True)
 
-#model = fmspy.mo.FmsModel(name='hs_with_clouds', dayslist='( 1460 )', dt_atmos=1800, \
-#                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=2)
+# create perturbation experiments using patch
+#model = fmspy.mo.FmsModel(name='strat_trop', exp_name="run_ctl_low-10", exp_name_src="run_ctl", dayslist='( 365 365 365 365 )', dt_atmos=400, 
+#                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=2, model2plevel=True, \
+#                          namelist_patch = {'hs_forcing_nml': {'del_ts_nh': -10.}})
 
-#model = fmspy.mo.FmsModel(name='f90', version="spectral_tutorial", exp_name="run_ctl")
+#model = fmspy.mo.FmsModel(name='strat_trop', exp_name="run_ctl_up40", exp_name_src="run_ctl", dayslist='( 365 365 365 365 )', dt_atmos=400, 
+#                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=2, model2plevel=True, \
+#                          namelist_patch = {'hs_forcing_nml': {'del_ts_nh_up': 40.}})
 
-#model = fmspy.mo.FmsModel(name='f90', version="Tpdf", exp_name="run_ctl", queue_cmd="")
+#model = fmspy.mo.FmsModel(name='strat_trop', exp_name="run_ctl_low-10_up40", exp_name_src="run_ctl", dayslist='( 365 365 365 365 )', dt_atmos=400, 
+#                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=2, model2plevel=True, \
+#                          namelist_patch = {'hs_forcing_nml': {'del_ts_nh': -10., 
+#			                                       'del_ts_nh_up': 40.}})
 
-model.setup2()        # run script is not executed
-#model.setup()        # run script is executed
+
+#model.setup2()        # run script is not executed
+model.setup()        # run script is executed
