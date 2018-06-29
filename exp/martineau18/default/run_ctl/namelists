@@ -1,0 +1,60 @@
+ &diag_manager_nml
+    mix_snapshot_average_fields=.false.,
+/
+
+&gaussian_topog_nml
+     topo_height            =  5000,
+     topo_lat1              =  25,
+     topo_lat2              =  65,
+     topo_wnum              =  2,
+     topo_lon0              =  0., 
+     topo_tilt              =  0.
+/
+
+ &fms_io_nml
+         threading_read  = 'multi'
+/
+
+ &fms_nml
+         domains_stack_size = 600000
+/
+
+ &hs_forcing_nml 
+     sponge                 = 'on',
+     equilibrium_t_option   = 'Martineau18',
+     eps                    = 10.,
+     t_strat                = 200.,
+     del_ts_sh              = 50.,
+     del_ts_nh              =-30.,
+     del_ts_nh_up           = 0,
+     relaxation_time        = "STRAT",
+ /
+
+ &spectral_dynamics_nml
+    print_interval          = 1, 0,
+    damping_option          = 'resolution_dependent',
+    damping_order           = 4,
+    damping_coeff           = 1.15741e-4,
+    do_mass_correction      =.true.,
+    do_energy_correction    =.true.,
+    do_water_correction     =.false.,
+    use_virtual_temperature =.false.,
+    vert_advect_uv          = 'second_centered',
+    vert_advect_t           = 'second_centered',
+    longitude_origin        = 0.,
+    robert_coeff            = .04,
+    alpha_implicit          = .5,
+    reference_sea_level_press=1.e5,
+    lon_max                 = 128,
+    lat_max                 = 64,
+    num_levels              = 40,
+    num_fourier             = 42,
+    num_spherical           = 43,
+    fourier_inc             = 1,
+    triang_trunc            =.true.,
+    vert_coord_option       = 'uneven_sigma_new',
+/
+
+&spectral_init_cond_nml
+    topography_option       = 'sinusoidal'
+/

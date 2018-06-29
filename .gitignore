@@ -1,0 +1,13 @@
+*~
+*.o
+*.mod
+!netcdf.mod
+*.x
+*.pyc
+__pycache__
+Makefile*
+/download/
+/src/my/
+/tests/
+/workdir/
+/exp/martineau18/default/run_ctl_*

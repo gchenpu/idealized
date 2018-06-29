@@ -211,4 +211,37 @@ def copy_exp_setup(src, dst, namelist_patch={}, option='overwrite'):
         f90nml.patch(full_src_name, namelist_patch, full_dst_name)
     else:
         copyfile(full_src_name, full_dst_name, option=option)
-    
+
+#===================================================================================
+# length of integration using monthslist, dayslist, secondslist
+# default: monthslist, dayslist, secondslist = "(0)", "(1)", "(0)"
+#===================================================================================
+def months_days_seconds_list(monthslist, dayslist, secondslist):
+    def str2tuple(s):
+        if (s == None):
+            return([])
+        else:
+            si = s.find('(')
+            se = s.find(')')
+            ss = s[si+1:se].strip()
+        return(ss.split())
+
+    mlen = len(str2tuple(monthslist))
+    dlen = len(str2tuple(dayslist))
+    slen = len(str2tuple(secondslist))
+    ilen = max(mlen, dlen, slen)
+
+    if (ilen == 0):
+        #default: integrating the model by 1 day
+        monthslist  = "(0)"
+        dayslist    = "(1)"
+        secondslist = "(0)"
+    else:
+        if(mlen < ilen):
+            monthslist  = "( " + "0 "*ilen + ")"
+        if(dlen < ilen):
+            dayslist    = "( " + "0 "*ilen + ")"
+        if(slen < ilen):
+            secondslist = "( " + "0 "*ilen + ")"
+
+    return monthslist, dayslist, secondslist

@@ -42,6 +42,7 @@
   set npes           = %(npes)s
   set monthslist     = %(monthslist)s
   set dayslist       = %(dayslist)s
+  set secondslist    = %(secondslist)s
   set dt_atmos       = %(dt_atmos)s
   set numSubmissions = 1
   alias time_stamp   "$rootdir/../bin/time_stamp.csh" 
@@ -335,6 +336,7 @@
 
     set days = $dayslist[$irun]
     set months = $monthslist[$irun]
+    set seconds = $secondslist[$irun]
 
     #all_namelists
 cp $namelist input.nml    
@@ -343,6 +345,7 @@ cat >> input.nml <<EOF
          calendar = '%(calendar)s',
          months   = $months,
          days     = $days,
+         seconds  = $seconds,
          dt_atmos = $dt_atmos /
 EOF
 
@@ -536,5 +539,6 @@ EOF
   endif
 
 unset echo
+%(plevel)s
 banner end_of_run
 echo "NOTE: Natural end-of-script for $scriptName."

@@ -17,13 +17,13 @@ class FmsModel:
     # initialize class variables
     #===================================================================================
     def __init__(self, name="fullrad", version="default", exp_name="run_ctl", exp_name_src=[],                        \
-        platform="ncar", compile_opt="", echo_opt="unset echo", monthslist="(0)", dayslist="(1)", dt_atmos=600,       \
+        platform="ncar", compile_opt="", echo_opt="unset echo", monthslist=None, dayslist=None, secondslist=None, dt_atmos=600,       \
 	queue_cmd="", proj_code="UCOR0011", walltime="06:00:00", queue_name= "share", nnodes=1, ncores=1, nthreads=1, \
-	namelist_patch={}, grid_spec="", init_cond=""):
+	namelist_patch={}, grid_spec="", init_cond="", model2plevel=False):
         # example of namelist_patch when exp_name_src is not []
         # namelist_patch = {'idealized_moist_phys_nml': {'radiation_scheme': 'two_stream'}, 'astronomy_nml': {'obliq': 23.5}}
 
-        if not name in ["fullrad", "gray", "hs", "hs_with_clouds", "f90"]:
+        if not name in ["fullrad", "gray", "hs", "hs_with_clouds", "f90", "martineau18"]:
             raise Exception("\"%s\" is not a model name!" % name)
 
         self.name            = name                                                 # model name
@@ -35,8 +35,7 @@ class FmsModel:
         self.compile_opt     = compile_opt                                          # compile option: "" for regular run and "debug" for debug
         self.echo_opt        = echo_opt                                             # unset echo or set echo in compile and run shell scripts        
 
-        self.monthslist      = monthslist
-        self.dayslist        = dayslist
+        self.monthslist, self.dayslist, self.secondslist = fmspy.io.months_days_seconds_list(monthslist, dayslist, secondslist)
         self.dt_atmos        = dt_atmos                                             # model time step in seconds
 
         self.queue_cmd       = queue_cmd                                            # "" or "qsub"
@@ -50,6 +49,7 @@ class FmsModel:
         self.namelist_patch  = namelist_patch
         self.grid_spec       = grid_spec
         self.init_cond       = init_cond
+        self.model2plevel    = model2plevel                                         # interpolate the model data to pressure levels if set as True
 
         self.mydir           = "exp"                                                ### user-defined dir of files
         self.workdir         = "workdir"                                            ### user-defined work dir
@@ -75,6 +75,8 @@ class FmsModel:
             self.mkmf_filename    = os.path.join(".", self.workdir, "bin", "mkmf.template."+self.platform+"."+self.compile_opt)
             self.compile_filename = os.path.join(".", self.workdir, self.name, "compile."+self.version+"."+self.compile_opt)
             self.run_filename     = os.path.join(".", self.workdir, self.name, self.version+"."+self.compile_opt, self.exp_name, "run")
+
+        self.plevel_filename      = os.path.abspath("./postprocessing/plevel.sh")
 
         # platform dependent configurations
         if self.platform == "ncar":
@@ -292,13 +294,32 @@ module load impi"""
         FTMPDIR          = "%s/tmp/%s" % (self.output_root, "$HOST.`date '+%m-%d@%H:%M:%S'`.id$$")
         other_time_stamp = "tmp`date '+%j%H%M%S'`"
 
+        if (not self.model2plevel):
+            plevel       = ""
+        else:
+            self.setup_plevel()
+            plevel       = \
+"""
+################# interpolate from model levels to pressure levels ###################
+set era40_levels = (100000 92500 85000 77500 70000 60000 50000 40000 30000 25000 20000 15000 \\
+                     10000  7000  5000  3000  2000  1000   700   500   300   200   100       )  
+
+cd $outputDir/history
+foreach file(*.nc)
+  echo $file
+  if (! -e {$file:r}_pl.nc) then
+  %s -a -d 0 -p "$era40_levels" -i $file -o {$file:r}_pl.nc
+  endif
+end
+""" % self.plevel_filename
+
         output_format = {'queue_info':self.queue_info, 'echo_opt':self.echo_opt, 'compile_opt':self.compile_opt, 'cwd':self.cwd, 'workdir':self.workdir, \
                          'name':self.name, 'version':self.version, 'exp_name':self.exp_name, 'FTMPDIR':FTMPDIR,                  \
                          'platform':self.platform, 'output_root':self.output_root, 'diagTable':diagTable, 'dataTable':dataTable, \
                          'fieldTable':fieldTable, 'gridSpec':gridSpec,  'initCond':initCond, 'diagTable2':diagTable2, 'dataTable2':dataTable2, \
                          'fieldTable2':fieldTable2, 'gridSpec2':gridSpec2,  'initCond2':initCond2,  'inputData':inputData,              \
-                         'npes':self.nnodes*self.ncores*self.nthreads, 'monthslist':self.monthslist, 'dayslist':self.dayslist, 'dt_atmos':self.dt_atmos,  \
-                         'compiler_info':self.compiler_info, 'other_time_stamp':other_time_stamp, 'calendar':calendar}
+                         'npes':self.nnodes*self.ncores*self.nthreads, 'monthslist':self.monthslist, 'dayslist':self.dayslist, 'secondslist':self.secondslist, 'dt_atmos':self.dt_atmos,  \
+                         'compiler_info':self.compiler_info, 'other_time_stamp':other_time_stamp, 'calendar':calendar, 'plevel':plevel}
         fmspy.io.write_script(self.run_filename, os.path.join(".", "bin/run.template"), output_format, option='overwrite')
 
     #===================================================================================
@@ -309,6 +330,20 @@ module load impi"""
         print("\nEXECUTING \"%s\"" % self.run_filename)
         os.chdir(os.path.dirname(self.run_filename))
         os.system(self.queue_cmd + ' ./' + os.path.basename(self.run_filename))
+        os.chdir(self.cwd)
+
+    #===================================================================================
+    # setup the plevel directory
+    #===================================================================================
+    def setup_plevel(self):
+        # create local compile and plevel scripts
+        print("\nSETTING UP \"plevel.sh\"")
+        output_format = {'cwd':self.cwd}
+        fmspy.io.write_script(os.path.join(".", "postprocessing/plevel/compile"), os.path.join(".", "postprocessing/plevel/templates/compile.template"), output_format, option='overwrite')
+        fmspy.io.write_script(os.path.join(".", "postprocessing/plevel.sh"),    os.path.join(".", "postprocessing/plevel/templates/plevel.sh.template"), output_format, option='overwrite')
+
+        os.chdir(os.path.join(self.cwd, "postprocessing/plevel"))
+        os.system('./compile')
         os.chdir(self.cwd)
 
     #===================================================================================
