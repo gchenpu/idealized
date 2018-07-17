@@ -17,10 +17,12 @@ use           fms_mod, only: error_mesg, FATAL, file_exist,       &
                              write_version_number, stdlog,        &
                              uppercase
 
-use  time_manager_mod, only: time_type
+use  time_manager_mod, only: time_type, get_time
 
 use  diag_manager_mod, only: register_diag_field, send_data
 
+use  field_manager_mod, only: MODEL_ATMOS, parse
+use tracer_manager_mod, only: query_method, get_number_tracers
 use   interpolator_mod, only: interpolate_type, interpolator_init, &
                               interpolator, interpolator_end, &
                               CONSTANT, INTERP_WEIGHTED_P
@@ -53,6 +55,10 @@ private
 
    logical :: do_conserve_energy = .true.
 
+   real :: trflux = 1.e-5   !  surface flux for optional tracer
+   real :: trsink = -4.     !  damping time for tracer
+   real :: aging_rate, onset
+
    character(len=256) :: local_heating_option='' ! Valid options are 'from_file' and 'Isidoro'. Local heating not done otherwise.
    character(len=256) :: local_heating_file=''   ! Name of file relative to $work/INPUT  Used only when local_heating_option='from_file'
    real :: local_heating_srfamp=0.0              ! Degrees per day.   Used only when local_heating_option='Isidoro'
@@ -75,7 +81,7 @@ private
                               sigma_b, ka, ks, kf, do_conserve_energy,       &
                               del_ts_sh, del_ts_nh, del_ts_nh_up,            &
                               relaxation_time,                               &
-                              local_heating_srfamp,                          &
+                              trflux, trsink, local_heating_srfamp,          &
                               local_heating_xwidth,  local_heating_ywidth,   &
                               local_heating_xcenter, local_heating_ycenter,  &
                               local_heating_vert_decay, local_heating_option,&
@@ -88,7 +94,8 @@ private
    character(len=128) :: version='$Id: hs_forcing.F90,v 19.0.2.2 2014/12/12 15:38:24 pjp Exp $'
    character(len=128) :: tagname='$Name: no_tracer_manager_pjp $'
 
-   real :: tka, tks, vkf, twopi
+   real :: tka, tks, vkf
+   real :: trdamp, twopi
 
    integer :: id_teq, id_tdt, id_udt, id_vdt, id_tdt_diss, id_diss_heat, id_local_heating, id_newtonian_damping
    real    :: missing_value = -1.e10
@@ -127,8 +134,9 @@ contains
    real, dimension(size(r,1),size(r,2),size(r,3)) :: rst, rtnd
    integer :: i, j, k, kb, n, num_tracers
    logical :: used
-   real    :: flux, sink, value
+   real    :: flux, sink, value, time_in_days
    character(len=128) :: scheme, params
+   integer :: seconds, days
 
 !-----------------------------------------------------------------------
      if (no_forcing) return
@@ -198,6 +206,55 @@ contains
 
       if (id_tdt > 0) used = send_data ( id_tdt, tdt, Time, is, js)
       if (id_teq > 0) used = send_data ( id_teq, teq, Time, is, js)
+
+!-----------------------------------------------------------------------
+!     -------- tracers -------
+
+      call get_number_tracers(MODEL_ATMOS, num_tracers=num_tracers)
+      call get_time(Time, seconds, days)
+      time_in_days=days+seconds/86400.
+
+      if(num_tracers == size(rdt,4)) then
+        do n = 1, size(rdt,4)
+           flux = trflux
+           sink = trsink
+           if (query_method('tracer_sms', MODEL_ATMOS, n, scheme, params)) then
+               if (uppercase(trim(scheme)) == 'NONE') cycle
+               if (uppercase(trim(scheme)) == 'OFF') then
+                 flux = 0.; sink = 0.
+               else
+                 if (parse(params,'flux',value) == 1) flux = value
+                 if (parse(params,'sink',value) == 1) sink = value
+               endif
+           endif
+           rst = rm(:,:,:,n) + dt*rdt(:,:,:,n)
+           call tracer_source_sink ( flux, sink, p_half, rst, rtnd, kbot )
+           rdt(:,:,:,n) = rdt(:,:,:,n) + rtnd
+
+	   if (query_method('tracer_uniform_aging', MODEL_ATMOS, n, scheme, params)) then
+  	       if (uppercase(trim(scheme)) == 'OFF') then
+	         aging_rate = 0.
+	       else
+	         if (parse(params,'aging_rate',value) == 1) then
+		 aging_rate = value
+		 else
+		 aging_rate = 0.
+		 endif
+		 if (parse(params,'onset',value) == 1) then
+		 onset = value
+		 else
+		 onset = 0.
+		 endif
+	       endif
+               if(time_in_days >= onset) rdt(:,:,:,n) = rdt(:,:,:,n) + aging_rate/86400.
+	   endif
+
+        enddo
+      else
+        call error_mesg('hs_forcing','size(rdt,4) not equal to num_tracers', FATAL)
+      endif
+
+!-----------------------------------------------------------------------
 
  end subroutine hs_forcing
 
@@ -279,6 +336,11 @@ contains
       else
         vkf = kf
       endif
+
+!     ----- for tracers -----
+
+      if (trsink < 0.) trsink = -86400.*trsink
+      trdamp = 0.; if (trsink > 0.) trdamp = 1./trsink
 
 !     ----- register diagnostic fields -----
 
@@ -756,6 +818,51 @@ real, dimension(size(u,2)) :: u_zm, v_zm
 !-----------------------------------------------------------------------
 
  end subroutine sponge_damping
+ 
+!#######################################################################
+
+ subroutine tracer_source_sink ( flux, damp, p_half, r, rdt, kbot )
+
+!-----------------------------------------------------------------------
+      real, intent(in)  :: flux, damp, p_half(:,:,:), r(:,:,:)
+      real, intent(out) :: rdt(:,:,:)
+   integer, intent(in), optional :: kbot(:,:)
+!-----------------------------------------------------------------------
+      real, dimension(size(r,1),size(r,2),size(r,3)) :: source, sink
+      real, dimension(size(r,1),size(r,2))           :: pmass
+
+      integer :: i, j, kb
+      real    :: rdamp
+!-----------------------------------------------------------------------
+
+      rdamp = damp
+      if (rdamp < 0.) rdamp = -86400.*rdamp   ! convert days to seconds
+      if (rdamp > 0.) rdamp = 1./rdamp
+
+!------------ simple surface source and global sink --------------------
+
+      source(:,:,:)=0.0
+
+   if (present(kbot)) then
+      do j=1,size(r,2)
+      do i=1,size(r,1)
+         kb = kbot(i,j)
+         pmass (i,j)    = p_half(i,j,kb+1) - p_half(i,j,kb)
+         source(i,j,kb) = flux/pmass(i,j)
+      enddo
+      enddo
+   else
+         kb = size(r,3)
+         pmass (:,:)    = p_half(:,:,kb+1) - p_half(:,:,kb)
+         source(:,:,kb) = flux/pmass(:,:)
+   endif
+
+     sink(:,:,:) = rdamp*r(:,:,:)
+     rdt(:,:,:) = source(:,:,:)-sink(:,:,:)
+
+!-----------------------------------------------------------------------
+
+ end subroutine tracer_source_sink
 
 !#######################################################################
 

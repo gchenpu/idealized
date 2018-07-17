@@ -14,3 +14,9 @@ Major updates from the Held-Suarez benchmark:
 --- hs_forcing.F90
 4. New vertical coordinates
 --- vert_coordinate.F90
+5. Tracers: (a) specify the boundary condition for tracers 
+--- spectral_dynamics.F90
+and (b) specify a globally uniform aging rate 
+--- hs_forcing.F90
+6. advecting tracers with adiabatic flow and diabatic flow separately
+--- spectral_dynamics.F90
