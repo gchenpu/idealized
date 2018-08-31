@@ -20,7 +20,7 @@ model.exec_compile()
 Here, an object called _model_ is an instance of the _FmsModel_ class. It is initialized with two parameters specified: _name_ and _version_. The _name_ is set to _"hs"_ which corresponds to Held-Suarez setup. One can choose other options like _"gray"_ or _"full_rad"_. This tells the object where to find the source code for a specific model. 
 
 The _version_ is set to a name defined by the user. This tells the model where to find the modified source code and include them in the compilation. Here it is set to _"v3.4e"_. This means in the folder ```/exp/hs/v3.4e/src/```, there should be modified source code for this specific version. A peek into this folder would look like this:
-![logo](https://raw.githubusercontent.com/dkwovn/fmspy_tutorial/master/v34e_src.png?token=AfyR3e4cNoh97UeT_F7ZX9gQ7QPLiYgTks5bh0c7wA%3D%3D)
+![logo](https://raw.githubusercontent.com/dkwovn/fmspy_tutorial/master/v34e_src.png?token=AfyR3eomXh5aqgb1jD51RKPD4O_GsC2Xks5bkwsgwA%3D%3D)
 Note that there is a file called ```path_name```. This should be copied from the ```/exp/hs/default/src``` folder. Also note that original versions of these F90 files exist in the ```/src/``` directory and will be ignored in the compilation. 
 
 If you need to change the source code of the model and make a new version, you can create a folder with the new version name ```/exp/hs/new_version_name/src```, copy the ```path_name``` into this folder and the F90 files you are willing to modify. Then modify those F90 files. Lastly, execute a compile script like the above one except set
@@ -62,7 +62,7 @@ All the variable assignments before the instantiation is just to make the code a
 ##### Namelists 
 All the modifications of the namelists is wrapped into a single parameter called _namelist_patch_. It is supposed to be a Python dictionary, i.e. nested key-value pairs. The dictionary for this run is constructed in the previous lines and is called _name_dict_. In this example, the _name_dict_ has two keys: 'hs_forcing_nml' and 'spectral_dynamics_nml', which are the names of two model nameslists. The values corresponding to these two keys are two additionaly dictionaries specifying the two namelists respectively. All the namelists values are case insensitive. 
 
-All the variables in the 'spectral_dynamics_nml' are unique to this version of model and configure the behavior of the overriding. The 'ovrd_option' can be 'full' meaning it's fully on, or 'none' meaning it's off. In the case of 'none', all the following variables would be ignored. The 'ovrd_folder' tells model where to look for the data storing the overriding zonal wind. 'ovrd_file_prefix' and 'ovrd_file_suffix' tells model the form of these overriding file names. It is assumed to be "prefix + year + suffix". The last variable 'ovrd_freq_option' specifies the frequency at which the overriding wind is updated. Another option is 'mean', meaning it is updated only once, using the climatological mean. 
+All the variables in the 'spectral_dynamics_nml' are unique to this version of model and configure the behavior of the overriding. The 'ovrd_option' can be 'full' meaning it's fully on, or 'none' meaning it's off. In the case of 'none', all the following variables would be ignored. The 'ovrd_folder' tells model where to look for the data storing the overriding zonal wind. 'ovrd_file_prefix' and 'ovrd_file_suffix' tells model the form of these overriding file names. It is assumed to be "prefix + year + suffix". The last variable 'ovrd_freq_option' specifies the frequency at which the overriding wind is updated. 
 ##### Runscript
 The two parameters that involve runscript changes are monthslist (might have been obsolete) and dayslist. The dayslist is a Python list that listed the number of days at each year. In this example, the run will cover 4 years with 365 days in each year. 
 ### Run 
@@ -100,3 +100,4 @@ model.exec_run()
 ```
 ### Debug
 If a run crashes, the log can be found in ```/workdir/hs/v3.4e/delh70_ovrd_cntr/``` for the above example. The 4 configurations files (written by the Python script) that are actually read by the model can also be found in the same folder. 
+
