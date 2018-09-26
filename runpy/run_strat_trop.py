@@ -17,8 +17,8 @@ import fmspy.mo
 # namelist_patch = {'idealized_moist_phys_nml': {'radiation_scheme': 'two_stream'}, 'astronomy_nml': {'obliq': 23.5}}
 
 # control experiment
-#model = fmspy.mo.FmsModel(name='strat_trop', exp_name="run_ctl_h0_ls-20_us20", dayslist='( 365 365 365 365 )', dt_atmos=600, 
-#                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=1, model2plevel=True)
+model = fmspy.mo.FmsModel(name='strat_trop', exp_name="run_ctl_h0_ls-20_us20", dayslist='( 365 365 365 365 )', dt_atmos=600, 
+                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=1, model2plevel=True)
 
 # create perturbation experiments using patch
 # varying the vortex strength
@@ -41,10 +41,10 @@ import fmspy.mo
 #                          namelist_patch = {'gaussian_topog_nml': {'topo_height': 4000., 
 # 			                                            'topo_wnum': 2} })
 
-model = fmspy.mo.FmsModel(name='strat_trop', exp_name="run_ctl_h6w2_ls-20_us20", exp_name_src="run_ctl_h0_ls-20_us20", dayslist='( 365 365 365 365 )', dt_atmos=600, 
-                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=1, model2plevel=True, \
-                          namelist_patch = {'gaussian_topog_nml': {'topo_height': 6000., 
- 			                                            'topo_wnum': 2} })
+#model = fmspy.mo.FmsModel(name='strat_trop', exp_name="run_ctl_h6w2_ls-20_us20", exp_name_src="run_ctl_h0_ls-20_us20", dayslist='( 365 365 365 365 )', dt_atmos=600, 
+#                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=1, model2plevel=True, \
+#                          namelist_patch = {'gaussian_topog_nml': {'topo_height': 6000., 
+# 			                                            'topo_wnum': 2} })
 
 #model.setup2()        # run script is not executed
 model.setup()        # run script is executed
