@@ -10,7 +10,7 @@ The Python script should be executed at the root directory of the model. The scr
 def __init__(self, name="fullrad", version="default", exp_name="run_ctl", exp_name_src=[], platform="ncar", compile_opt="", echo_opt="unset echo", monthslist="(0)", dayslist="(1)", dt_atmos=600,  queue_cmd="", proj_code="UCOR0011", walltime="06:00:00", queue_name= "share", nnodes=1, ncores=1, nthreads=1, namelist_patch={}, grid_spec="", init_cond=""):
 ```
 Although having many parameters, as will be shown later, only a small subset of the parameters need to be specified when doing certain things. Below is an example of how to use this class to compile and run the dynamical core with Held-Suarez forcing.
-### Compile 
+### 1. Compile 
 A minimalist script that compile a version of the dynamical core would look like this:
 ```python
 import fmspy.mo
@@ -30,7 +30,7 @@ If you need to change the source code of the model and make a new version, you c
 model = fmspy.mo.FmsModel(name = 'hs', version = 'new_version_name')
 ```
 in the second line.
-### Configure 
+### 2. Configure 
 With a compiled model, we can run experiments using various configurations. Without the _FmsModel_ class, this would usually involve editing the following 4 files.
 1. namelists
    A template of default namelists is stored as ```/exp/hs/default/run_ctl/namelists```. It is usually the most frequently changed file as it specifies almost all the running configurations such as resolution, damping, physics etc. The overriding options are also configured through namelists.
@@ -67,7 +67,7 @@ All the modifications of the namelists is wrapped into a single parameter called
 All the variables in the 'spectral_dynamics_nml' are unique to this version of model and configure the behavior of the overriding. The 'ovrd_option' can be 'full' meaning it's fully on, or 'none' meaning it's off. In the case of 'none', all the following variables would be ignored. The 'ovrd_folder' tells model where to look for the data storing the overriding zonal wind. 'ovrd_file_prefix' and 'ovrd_file_suffix' tells model the form of these overriding file names. It is assumed to be "prefix + year + suffix". The last variable 'ovrd_freq_option' specifies the frequency at which the overriding wind is updated. 
 ##### Runscript
 The two parameters that involve runscript changes are monthslist (might have been obsolete) and dayslist. The dayslist is a Python list that listed the number of days at each year. In this example, the run will cover 4 years with 365 days in each year. 
-### Run 
+### 3. Run 
 Before we want to hit the go button, there are a few more options we might want to configure. These options don't affect the model output but affect performance, cost etc.
 ```Python
 model = fmspy.mo.FmsModel(..., dt_atmos=1800, queue_name="share", queue_cmd="qsub", nnodes=1, ncores=16, nthreads=2)
@@ -100,7 +100,7 @@ model = fmspy.mo.FmsModel(name='hs', version='v3.4e', exp_name='delh70_ovrd_cntr
 model.setup_run()
 model.exec_run()
 ```
-### Debug
+### 4. Debug
 If a run crashes, the log can be found in ```/workdir/hs/v3.4e/delh70_ovrd_cntr/``` for the above example. The 4 configurations files (written by the Python script) that are actually read by the model can also be found in the same folder. 
 
 ## Part II: Modifications for FMS dynamical core
