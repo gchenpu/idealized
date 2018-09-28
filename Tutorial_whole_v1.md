@@ -1,5 +1,7 @@
 # Tutorial for running the FMS models
-This is a tutorial for running a modified version of GFDL FMS models. This version has an option to override the advective zonal mean zonal wind (see <reference> for more details) in the dynamical core. The first part of the tutorial introduces a python script that compiles and run models automatically. The second part introduces the modifications to the model code. The third part document the setups for a few standrad and overriding simulations.
+This is a tutorial for running a modified version of GFDL FMS models. Three models will be used that combine the GFDL dynamical core with physics of varying complexity. The first one employs the dry Held-Suarez physics where the diabatic heating is represented by relaxation to a prescribed radiative equilibrium temperature. This setup isolates the role of large-scale dynamics by greatly simplifying the physical processes and enables clean tests for theories. The second model considers the partial contribution of moisture by applying the gray-radiation scheme. The third model further includes the cloud parameterization schemes to better represent the radiative processes.
+
+All three models are modified to have an option to override the advective zonal mean zonal wind (see <reference> for more details) in the dynamical core. The first part of the tutorial introduces a python script that compiles and run models automatically. The second part introduces the modifications to the model code. The third part document the setups for a few standrad and overriding simulations.
 
 
 ## Part I: A quick start (introducing the python script)
@@ -30,7 +32,7 @@ If you need to change the source code of the model and make a new version, you c
 model = fmspy.mo.FmsModel(name = 'hs', version = 'new_version_name')
 ```
 in the second line.
-### 2. Configure 
+### 3. Configure 
 With a compiled model, we can run experiments using various configurations. Without the _FmsModel_ class, this would usually involve editing the following 4 files.
 1. namelists
    A template of default namelists is stored as ```/exp/hs/default/run_ctl/namelists```. It is usually the most frequently changed file as it specifies almost all the running configurations such as resolution, damping, physics etc. The overriding options are also configured through namelists.
