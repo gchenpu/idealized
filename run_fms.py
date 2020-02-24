@@ -22,11 +22,11 @@ import fmspy.mo
 #model = fmspy.mo.FmsModel(name="gray",  dayslist='( 365 365 365 365 )', dt_atmos=600, \
 #                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=2)
 
-#model = fmspy.mo.FmsModel(name='hs',    dayslist='( 365 365 365 365 )', dt_atmos=1800, \
-#                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=2)
+model = fmspy.mo.FmsModel(name='hs',    dayslist='( 365 365 365 365 )', dt_atmos=1800, \
+                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=2)
 
-model = fmspy.mo.FmsModel(name='strat_trop', dayslist='( 365 365 365 365 )', dt_atmos=400, 
-                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=2, model2plevel=True)
+#model = fmspy.mo.FmsModel(name='strat_trop', dayslist='( 365 365 365 365 )', dt_atmos=400, 
+#                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=2, model2plevel=True)
 
 #model = fmspy.mo.FmsModel(name='hs_with_clouds', dayslist='( 1460 )', dt_atmos=1800, \
 #                          queue_cmd="qsub", nnodes=1, ncores=16, nthreads=2)

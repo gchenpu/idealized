@@ -17,7 +17,7 @@ import fmspy.mo
 # namelist_patch = {'idealized_moist_phys_nml': {'radiation_scheme': 'two_stream'}, 'astronomy_nml': {'obliq': 23.5}}
 
 # control experiment
-model = fmspy.mo.FmsModel(name='f90', version="Tpdf", exp_name="run_ctl", queue_cmd="", nnodes=1, ncores=1, nthreads=1)
+model = fmspy.mo.FmsModel(name='f90', version="Ladv", exp_name="run_ctl", queue_cmd="", nnodes=1, ncores=1, nthreads=1)
 
 # perturbationo experiment
 #model = fmspy.mo.FmsModel(name='f90', version="Tpdf", exp_name="run_ctl_mean_grad", exp_name_src="run_ctl", queue_cmd="qsub", nnodes=1, ncores=1, nthreads=1, \

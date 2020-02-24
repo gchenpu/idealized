@@ -5,13 +5,13 @@ import os
 import fmspy.io
 
 #===================================================================================
-#model_name     = "f90"
-#version        = "Tpdf"
-#runscript_name = "Tpdf"
+model_name     = "f90"
+version        = "Tpdf"
+runscript_name = "Tpdf"
 
-model_name      = "strat_trop"
-version         = "default"
-runscript_name  = "strat_trop"
+#model_name      = "hs_with_clouds"
+#version         = "default"
+#runscript_name  = "hs_with_clouds"
 
 #===================================================================================
 if(not os.path.exists("../data/release/"+model_name+"/exp/"+model_name+"/"+version)):
