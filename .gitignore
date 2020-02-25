@@ -11,3 +11,4 @@ Makefile*
 /tests/
 /workdir/
 /exp/strat_trop/default/run_ctl_*
+/exp/hs/wave_model
