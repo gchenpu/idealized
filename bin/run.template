@@ -202,6 +202,9 @@
       else if ( $initCond:e == cpio ) then
         cpio -ic < $initCond >& /dev/null
       endif
+      if ( $initCond:e == nc ) then
+         cp $initCond $initCond:t
+      endif
     endif
   endif
 
