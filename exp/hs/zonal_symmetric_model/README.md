@@ -11,6 +11,7 @@ see the changes in
 Modified namelist parameters
 - set the model truncation to zonally symmetric (i.e., fourier_inc = num_fourier)
 - create climatology.nc using matlab; read the file as the initial condition (i.e., initial_state_option    = 'input'); set up the option in ic_from_external_file_nml for the input file
+- adjust forcing and tendency values
 
 See the changes in
 - default namelist: [namelists](../default/run_ctl/namelists)
