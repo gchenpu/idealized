@@ -1,31 +1,39 @@
-Where to start
-~~~~~~~~~~~~~~
-Documentation of these models can be found here:
+## What is this github project about?
+This github site describes various modified versions of the GFDL Idealized Spectral Atmospheric Models by [my research group](http://gchenpu.com/code/) at UCLA.  These modifications are designed to answer certain research questions that cannot be easily addressed by playing with the default model code.  As different research groups may have different versions of the idealized models, we have provided the comparison between default and modified configurations to facilitate the implementations in other model versions or different models.  The models are also run through a python interface and tested at the NCAR supercomputer.  Questions about these modifications can be sent to [my contact information](http://gchenpu.com/group/).
+
+## Where to start:
+Documentation of the GFDL Idealized Global Atmospheric Models with Spectral Dynamics can be found here:
 http://www.gfdl.noaa.gov/idealized-spectral-models-quickstart
 
-Summary of directory contents
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bin/
-     -- mkmf script for creating Makefiles
-     -- template files for the mkmf script
-     -- list_paths generates a list of source code files using find
-     -- time_stamp.csh used by run script
+## Specific configurations
+- [how to test the spectral transforms in the model?](../exp/f90/spectral_tutorial)?
+- [how to set up a zonally symmetric version of the model with the same climatology of the full model](../exp/hs/zonal_symmetric_model)?
 
-barotropic/ -- compile script. (uses mkmf)
-            -- list of source code files needed for barotropic model. (used by mkmf)
-            -- script for running the barotropic model.
-            -- input data files needed for barotropic model.
+## Summary of directory contents
+bin/  
+- mkmf script for creating Makefiles  
+- template files for the mkmf, compile, and run scripts  
+- time_stamp.csh used by run script  
 
-shallow/   -- compile script. (uses mkmf)
-           -- list of source code files needed for shallow water model. (used by mkmf)
-           -- script for running the shallow water model.
-           -- input data files needed for shallow water model.
+docs/  
+- documentations  
 
-full_dynamics/ -- compile script. (uses mkmf)
-               -- list of source code files needed for full spectral dynamics model. (used by mkmf)
-               -- script for running the full spectral dynamics model.
-               -- input data files needed for full spectral dynamics model.
+exps/  
+- different configurations of the models
+  - f90: Examples of very simple models using the subroutine in the spectral model
+  - hs: Held Suarez model
 
-src/ -- source code files
+fmspy/  
+- a python interface that helps compile and run different models
 
-postprocessing/ -- contains source code for a tool for combining distributed diagnostic output files
+netcdf/  
+- netcdf libraries used
+
+postprocessing/  
+- mppnccombine: a tool for combining distributed diagnostic output files
+- plevel: a tool for interpolating data from model levels to pressure levels
+
+src/  
+- default source code files
+
+run_fms.py:  python script to compile and run the model
