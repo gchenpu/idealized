@@ -7,6 +7,7 @@ Modified changes to the code
 see the changes in
 - default src code: [spectral_dynamics.F90](../../../src/atmos_spectral/model/spectral_dynamics.F90)
 - modified src code: [spectral_dynamics.F90](./src/spectral_dynamics.F90)
+diff ../../../src/atmos_spectral/model/spectral_dynamics.F90 ./src/spectral_dynamics.F90
 
 Modified namelist parameters
 - set the model truncation to zonally symmetric (i.e., fourier_inc = num_fourier)
@@ -16,7 +17,8 @@ Modified namelist parameters
 See the changes in
 - default namelist: [namelists](../default/run_ctl/namelists)
 - namelist for run_ctl_forcing: [namelists](./run_ctl_forcing/namelists)
-- namelist for run_ctl: ./run_ctl/namelists
+- namelist for run_ctl: [namelists](./run_ctl/namelists)
+diff ../default/run_ctl/namelists ./run_ctl/namelists
 
 ## Summary of directory contents
 run_ctl_forcing/  
