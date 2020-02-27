@@ -5,6 +5,7 @@ Kushner, P. J., & Polvani, L. M. L. (2004). Stratosphere–Troposphere Coupling 
 An extension of this method was decribed in  
 Domeisen, D. I. V., Sun, L., & Chen, G. (2013). The role of synoptic eddies in the tropospheric response to stratospheric variability. Geophysical Research Letters, 40(18), 4933–4937. https://doi.org/10.1002/grl.50943
 
+## Changes to the src code and namelist parameters
 Modified changes to the code 
 - tendency option to save the tendencies from integrating the model by one time step; 
 - forcing option to add the prescribed forcing to the model  
