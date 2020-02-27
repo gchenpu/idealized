@@ -15,8 +15,8 @@ Modified namelist parameters
 
 See the changes in
 - default namelist: [namelists](../default/run_ctl/namelists)
-- namelist for run_ctl_forcing: [namelists](./run_ctl/namelists)
-- namelist for run_ctl: [namelists](./run_ctl/namelists)
+- namelist for run_ctl_forcing: [namelists](./run_ctl_forcing/namelists)
+- namelist for run_ctl: ./run_ctl/namelists
 
 ## Summary of directory contents
 run_ctl_forcing/  
