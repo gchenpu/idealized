@@ -1,4 +1,4 @@
-## zonally symmetric model modified from the [default Held-Suarez model](../default)
+## Zonally symmetric model modified from the [default Held-Suarez model](../default)
 
 ## modified changes to the code
 - tendency option to save the tendencies from integrating the model by one time step; 
