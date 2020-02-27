@@ -1,9 +1,11 @@
 ## Zonally symmetric model modified from the [default Held-Suarez model](../default)  
+~~~
 The method follows the appendix of  
 Kushner, P. J., & Polvani, L. M. L. (2004). Stratosphere–Troposphere Coupling in a Relatively Simple AGCM: The Role of Eddies. Journal of Climate, 17(3), 629–639. [Link](https://doi.org/10.1175/1520-0442(2004)017<0629:SCIARS>2.0.CO;2)  
 
 An extension of this method was decribed in  
 Domeisen, D. I. V., Sun, L., & Chen, G. (2013). The role of synoptic eddies in the tropospheric response to stratospheric variability. Geophysical Research Letters, 40(18), 4933–4937. [link](https://doi.org/10.1002/grl.50943)
+~~~
 
 Modified changes to the code
 - tendency option to save the tendencies from integrating the model by one time step; 
