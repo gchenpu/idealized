@@ -19,9 +19,16 @@ import fmspy.mo
 #model = fmspy.mo.FmsModel(name='hs', version='wave_model', exp_name="run_ctl", dayslist='( 365 365 365 365 )', dt_atmos=1800, \
 #                          queue_cmd="qsub", proj_code="UCLA0027", nnodes=1, ncores=16, nthreads=2)
 			  
-model = fmspy.mo.FmsModel(name='hs', version='zonal_symmetric_model', exp_name="run_ctl_forcing", secondslist='( 1800 )', dt_atmos=1800, \
-                          echo_opt="unset echo", queue_cmd="", proj_code="UCLA0027", nnodes=1, ncores=1, nthreads=1, \
-                          init_cond="/glade/u/home/chen/idealized/exp/hs/zonal_symmetric_model/run_ctl_forcing/init_cond.nc")
+#model = fmspy.mo.FmsModel(name='hs', version='zonal_symmetric_model', exp_name="run_ctl_forcing", secondslist='( 1800 )', dt_atmos=1800, \
+#                          queue_cmd="", proj_code="UCLA0027", nnodes=1, ncores=1, nthreads=1, \
+#                          init_cond="/glade/u/home/chen/idealized/exp/hs/zonal_symmetric_model/run_ctl_forcing/climatology.nc")
+
+#model = fmspy.mo.FmsModel(name='hs', version='zonal_symmetric_model', exp_name="run_ctl", dayslist='( 5 )', dt_atmos=1800, \
+#                          queue_cmd="", proj_code="UCLA0027", nnodes=1, ncores=1, nthreads=1, \
+#                          init_cond="/glade/u/home/chen/idealized/exp/hs/zonal_symmetric_model/run_ctl_forcing/climatology.nc")
+
+model = fmspy.mo.FmsModel(name='hs', version='zonal_symmetric_model', exp_name="run_ctl", dayslist='( 365 365 )', dt_atmos=1800, \
+                          queue_cmd="", proj_code="UCLA0027", nnodes=1, ncores=1, nthreads=1)
 
 #model.setup2()        # run script is not executed
 model.setup()        # run script is executed

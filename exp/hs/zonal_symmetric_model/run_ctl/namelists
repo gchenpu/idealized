@@ -1,0 +1,40 @@
+ &diag_manager_nml
+    mix_snapshot_average_fields=.false.,
+/
+
+ &fms_io_nml
+         threading_read  = 'multi'
+/
+
+ &fms_nml
+         domains_stack_size = 600000
+/
+
+ &hs_forcing_nml /
+
+
+ &spectral_dynamics_nml
+    damping_option          = 'resolution_dependent',
+    damping_order           = 4,
+    damping_coeff           = 1.15741e-4,
+    do_mass_correction      =.true.,
+    do_energy_correction    =.true.,
+    do_water_correction     =.false.,
+    use_virtual_temperature =.false.,
+    vert_advect_uv          = 'second_centered',
+    vert_advect_t           = 'second_centered',
+    longitude_origin        = 0.,
+    robert_coeff            = .04,
+    alpha_implicit          = .5,
+    reference_sea_level_press=1.e5,
+    lon_max                 = 128,
+    lat_max                 = 64,
+    num_levels              = 20,
+    num_fourier             = 42,
+    num_spherical           = 43,
+    fourier_inc             = 42,
+    triang_trunc            =.true.,
+    vert_coord_option       = 'even_sigma',
+    forcing                 = '/glade/u/home/chen/idealized/exp/hs/zonal_symmetric_model/run_ctl_forcing/eddy_forcing.nc',
+    tendency                = ''
+/

@@ -47,7 +47,7 @@
   set numSubmissions = 1
   alias time_stamp   "$rootdir/../bin/time_stamp.csh" 
   alias mppnccombine "$rootdir/../bin/mppnccombine.$platform"
-  alias banner       "$rootdir/../bin/echo_white_on_blue"
+  alias banner       "$rootdir/../bin/banner"
 
   limit stacksize unlimited
   limit coredumpsize unlimited
