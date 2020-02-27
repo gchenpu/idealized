@@ -10,6 +10,5 @@ Makefile*
 /src/my/
 /tests/
 /workdir/
-/runpy/
 /exp/strat_trop/default/run_ctl_*
 /exp/hs/wave_model
