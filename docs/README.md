@@ -6,7 +6,7 @@ Documentation of the GFDL Idealized Global Atmospheric Models with Spectral Dyna
 http://www.gfdl.noaa.gov/idealized-spectral-models-quickstart
 
 ## Specific configurations
-- [how to test the spectral transforms in the model?](../exp/f90/spectral_tutorial)
+- [how to understand the spectral transforms in the model?](../exp/f90/spectral_tutorial)
 - [how to set up a zonally symmetric version of the model with the same climatology of the full model?](../exp/hs/zonal_symmetric_model)
 - more to be added
 
